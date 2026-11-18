@@ -31,6 +31,7 @@ class DetallePedido extends Model
 
     public function producto(): BelongsTo
     {
-        return $this->belongsTo(Producto::class);
+        // withTrashed: el renglón sigue mostrando el producto aunque se haya borrado
+        return $this->belongsTo(Producto::class)->withTrashed();
     }
 }
