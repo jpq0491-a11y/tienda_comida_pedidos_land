@@ -33,6 +33,12 @@ class Producto extends Model
         return $this->belongsTo(Categoria::class);
     }
 
+    // Etiquetas del producto (M:N) usando la pivote etiqueta_producto
+    public function etiquetas(): BelongsToMany
+    {
+        return $this->belongsToMany(Etiqueta::class);
+    }
+
     // Pedidos en los que aparece el producto (M:N) usando detalle_pedidos como tabla pivote
     public function pedidos(): BelongsToMany
     {
