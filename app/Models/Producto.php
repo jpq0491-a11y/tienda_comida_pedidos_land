@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Producto extends Model
@@ -30,5 +31,13 @@ class Producto extends Model
     public function categoria(): BelongsTo
     {
         return $this->belongsTo(Categoria::class);
+    }
+
+    // Pedidos en los que aparece el producto (M:N) usando detalle_pedidos como tabla pivote
+    public function pedidos(): BelongsToMany
+    {
+        return $this->belongsToMany(Pedido::class, 'detalle_pedidos') // nombre fuera de convención
+            ->withPivot('cantidad', 'precio_unitario', 'subtotal')
+            ->withTimestamps();
     }
 }

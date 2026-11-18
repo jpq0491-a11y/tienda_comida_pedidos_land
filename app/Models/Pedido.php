@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pedido extends Model
@@ -41,6 +42,15 @@ class Pedido extends Model
     public function detalles(): HasMany
     {
         return $this->hasMany(DetallePedido::class);
+    }
+
+    // Productos del pedido (M:N) usando detalle_pedidos como tabla pivote
+    public function productos(): BelongsToMany
+    {
+        return $this->belongsToMany(Producto::class, 'detalle_pedidos') // nombre fuera de convención
+            ->withPivot('cantidad', 'precio_unitario', 'subtotal')
+            ->withTimestamps()
+            ->withTrashed(); // para que los pedidos viejos sigan mostrando productos borrados
     }
 
     public function sucursal(): BelongsTo
