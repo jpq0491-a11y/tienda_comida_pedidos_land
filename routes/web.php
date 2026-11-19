@@ -10,6 +10,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Panel de administración: requiere sesión iniciada y pasar el Gate 'administrar'
 Route::middleware(['auth', 'can:administrar'])->prefix('admin')->name('admin.')->group(function () {
+    Route::view('/', 'admin.inicio')->name('inicio');
+
     // Aquí irán los CRUD de categorías y productos y el panel de pedidos
 });
 
