@@ -15,11 +15,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // Administrador para entrar al panel (contraseña: password).
+        // 'rol' no está en fillable, pero la factory sí lo deja asignar.
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Administrador',
+            'email' => 'admin@tienda.test',
+            'rol' => 'admin',
+        ]);
+
+        // EtiquetaSeeder va antes que MenuSeeder porque el menú usa las etiquetas
+        $this->call([
+            SucursalSeeder::class,
+            EtiquetaSeeder::class,
+            MenuSeeder::class,
         ]);
     }
 }
