@@ -39,7 +39,13 @@
                                 <i class="bi bi-tags"></i> Categorías
                             </a>
                         </li>
-                        {{-- Aquí se agregarán Productos y Pedidos --}}
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.productos.*') ? 'active' : '' }}"
+                                href="{{ route('admin.productos.index') }}">
+                                <i class="bi bi-egg-fried"></i> Productos
+                            </a>
+                        </li>
+                        {{-- Aquí se agregará Pedidos --}}
                     </ul>
                 @endcan
 
