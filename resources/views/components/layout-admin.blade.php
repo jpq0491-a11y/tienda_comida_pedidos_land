@@ -33,7 +33,13 @@
                                 <i class="bi bi-house"></i> Inicio
                             </a>
                         </li>
-                        {{-- Aquí se agregarán Categorías, Productos y Pedidos --}}
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}"
+                                href="{{ route('admin.categorias.index') }}">
+                                <i class="bi bi-tags"></i> Categorías
+                            </a>
+                        </li>
+                        {{-- Aquí se agregarán Productos y Pedidos --}}
                     </ul>
                 @endcan
 
@@ -57,6 +63,14 @@
         @if (session('exito'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('exito') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        @endif
+
+        {{-- Mensaje cuando una acción no se pudo hacer (por ejemplo, borrar una categoría con productos) --}}
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
             </div>
         @endif
