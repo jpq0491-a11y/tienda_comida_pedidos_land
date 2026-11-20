@@ -47,6 +47,16 @@ class UserFactory extends Factory
     }
 
     /**
+     * Usuario administrador del panel (rol no está en $fillable, pero las factories sí pueden llenarlo).
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'rol' => 'admin',
+        ]);
+    }
+
+    /**
      * Indicate that the model has two-factor authentication configured.
      */
     public function withTwoFactor(): static
