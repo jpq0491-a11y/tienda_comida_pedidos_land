@@ -5,7 +5,8 @@
         <div class="card-body">
             <x-errores-formulario />
 
-            <form action="{{ route('admin.productos.store') }}" method="POST">
+            <form action="{{ route('admin.productos.store') }}" method="POST" enctype="multipart/form-data">
+                {{-- enctype es obligatorio para mandar archivos; sin él solo llega el nombre --}}
                 @csrf
                 @include('admin.productos._formulario')
 

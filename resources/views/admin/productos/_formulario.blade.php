@@ -45,6 +45,29 @@
 </div>
 
 <div class="mb-3">
+    <label for="imagen" class="form-label">Imagen <span class="text-muted">(opcional)</span></label>
+    @if ($producto->imagen)
+        {{-- Vista previa de la imagen actual (solo al editar) --}}
+        <div class="mb-2">
+            <img src="{{ Storage::url($producto->imagen) }}" alt="Imagen actual de {{ $producto->nombre }}"
+                class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+        </div>
+    @endif
+    {{-- accept solo filtra el selector del navegador; la validación real está en el Form Request --}}
+    <input type="file" id="imagen" name="imagen" accept=".jpg,.jpeg,.png,.webp"
+        class="form-control @error('imagen') is-invalid @enderror">
+    <div class="form-text">
+        JPG, PNG o WEBP, máximo 2 MB.
+        @if ($producto->imagen)
+            Si eliges otra, reemplaza a la actual.
+        @endif
+    </div>
+    @error('imagen')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
+<div class="mb-3">
     <label for="etiquetas" class="form-label">Etiquetas <span class="text-muted">(opcional)</span></label>
     {{-- name="etiquetas[]": los corchetes hacen que lleguen como arreglo --}}
     <select id="etiquetas" name="etiquetas[]" multiple size="{{ max(3, min($etiquetas->count(), 6)) }}"

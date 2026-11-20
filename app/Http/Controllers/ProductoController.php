@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateProductoRequest;
 use App\Models\Categoria;
 use App\Models\Etiqueta;
 use App\Models\Producto;
+use Illuminate\Support\Facades\Storage;
 
 class ProductoController extends Controller
 {
@@ -30,8 +31,16 @@ class ProductoController extends Controller
 
     public function store(StoreProductoRequest $request)
     {
-        // 'etiquetas' no es columna de productos: se guarda aparte en la tabla pivote
-        $producto = Producto::create($request->safe()->except('etiquetas'));
+        // 'etiquetas' no es columna de productos (va en la pivote) y 'imagen' llega como archivo, no como texto
+        $datos = $request->safe()->except(['etiquetas', 'imagen']);
+
+        if ($request->hasFile('imagen')) {
+            // store() pone un nombre aleatorio y la extensión según el contenido; regresa la ruta relativa
+            // (ej. productos/kD9fXq2LmZ.jpg), que es lo que se guarda en la BD
+            $datos['imagen'] = $request->file('imagen')->store('productos', 'public');
+        }
+
+        $producto = Producto::create($datos);
 
         // attach agrega las filas en etiqueta_producto (el producto es nuevo, no tiene ninguna)
         $producto->etiquetas()->attach($request->validated('etiquetas', []));
@@ -50,7 +59,19 @@ class ProductoController extends Controller
 
     public function update(UpdateProductoRequest $request, Producto $producto)
     {
-        $producto->update($request->safe()->except('etiquetas'));
+        $datos = $request->safe()->except(['etiquetas', 'imagen']);
+
+        // Si no suben imagen nueva, se conserva la que ya tenía
+        if ($request->hasFile('imagen')) {
+            // Se borra la anterior para no dejar un archivo huérfano en el disco
+            if ($producto->imagen) {
+                Storage::disk('public')->delete($producto->imagen);
+            }
+
+            $datos['imagen'] = $request->file('imagen')->store('productos', 'public');
+        }
+
+        $producto->update($datos);
 
         // sync deja exactamente las etiquetas elegidas: agrega las nuevas y quita las desmarcadas.
         // Si no se elige ninguna, el select no manda nada y [] quita todas.
@@ -62,7 +83,8 @@ class ProductoController extends Controller
 
     public function destroy(Producto $producto)
     {
-        // Soft delete: el producto deja de verse, pero sigue en la tabla para los pedidos anteriores
+        // Soft delete: el producto deja de verse, pero sigue en la tabla para los pedidos anteriores.
+        // La imagen NO se borra: si el producto se restaura, debe seguir teniendo su foto.
         $producto->delete();
 
         return redirect()->route('admin.productos.index')

@@ -5,7 +5,8 @@
         <div class="card-body">
             <x-errores-formulario />
 
-            <form action="{{ route('admin.productos.update', $producto) }}" method="POST">
+            <form action="{{ route('admin.productos.update', $producto) }}" method="POST" enctype="multipart/form-data">
+                {{-- enctype es obligatorio para mandar archivos; sin él solo llega el nombre --}}
                 @csrf
                 @method('PUT')
                 @include('admin.productos._formulario')

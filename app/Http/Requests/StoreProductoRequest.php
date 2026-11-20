@@ -24,6 +24,10 @@ class StoreProductoRequest extends FormRequest
             'disponible' => ['boolean'],
             'etiquetas' => ['nullable', 'array'],
             'etiquetas.*' => ['integer', 'exists:etiquetas,id'],
+            // Seguridad: image y mimes revisan el CONTENIDO real del archivo; extensions revisa el NOMBRE.
+            // Juntas rechazan un .php aunque venga renombrado (virus.php -> virus.jpg) o disfrazado
+            // (contenido de imagen con nombre foto.php). Sin svg: puede llevar JavaScript.
+            'imagen' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 
@@ -43,6 +47,11 @@ class StoreProductoRequest extends FormRequest
             'etiquetas.array' => 'Las etiquetas no son válidas.',
             'etiquetas.*.integer' => 'Una de las etiquetas elegidas no es válida.',
             'etiquetas.*.exists' => 'Una de las etiquetas elegidas no existe.',
+            'imagen.uploaded' => 'La imagen no se pudo subir; revisa que no pese más de 2 MB.',
+            'imagen.image' => 'El archivo debe ser una imagen.',
+            'imagen.mimes' => 'La imagen debe ser JPG, PNG o WEBP.',
+            'imagen.extensions' => 'La imagen debe tener extensión .jpg, .jpeg, .png o .webp.',
+            'imagen.max' => 'La imagen no puede pesar más de 2 MB.',
         ];
     }
 }

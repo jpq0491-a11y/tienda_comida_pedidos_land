@@ -10,6 +10,7 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
+                        <th style="width: 64px;">Imagen</th>
                         <th>Nombre</th>
                         <th>Categoría</th>
                         <th>Etiquetas</th>
@@ -21,6 +22,17 @@
                 <tbody>
                     @forelse ($productos as $producto)
                         <tr>
+                            <td>
+                                @if ($producto->imagen)
+                                    <img src="{{ Storage::url($producto->imagen) }}" alt="{{ $producto->nombre }}"
+                                        class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
+                                @else
+                                    <div class="rounded bg-light text-muted d-flex align-items-center justify-content-center"
+                                        style="width: 48px; height: 48px;">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                @endif
+                            </td>
                             <td>{{ $producto->nombre }}</td>
                             {{-- La categoría ya viene cargada por el with('categoria') del controlador --}}
                             <td>{{ $producto->categoria->nombre }}</td>
@@ -56,7 +68,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">Todavía no hay productos.</td>
+                            <td colspan="7" class="text-center text-muted py-4">Todavía no hay productos.</td>
                         </tr>
                     @endforelse
                 </tbody>
