@@ -12,6 +12,7 @@
                     <tr>
                         <th>Nombre</th>
                         <th>Categoría</th>
+                        <th>Etiquetas</th>
                         <th class="text-end">Precio</th>
                         <th class="text-center">Disponible</th>
                         <th class="text-end">Acciones</th>
@@ -23,6 +24,14 @@
                             <td>{{ $producto->nombre }}</td>
                             {{-- La categoría ya viene cargada por el with('categoria') del controlador --}}
                             <td>{{ $producto->categoria->nombre }}</td>
+                            {{-- Las etiquetas también vienen cargadas por el with() --}}
+                            <td>
+                                @forelse ($producto->etiquetas as $etiqueta)
+                                    <span class="badge text-bg-info">{{ $etiqueta->descripcion }}</span>
+                                @empty
+                                    <span class="text-muted">—</span>
+                                @endforelse
+                            </td>
                             <td class="text-end">${{ number_format($producto->precio, 2) }}</td>
                             <td class="text-center">
                                 @if ($producto->disponible)
@@ -47,7 +56,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">Todavía no hay productos.</td>
+                            <td colspan="6" class="text-center text-muted py-4">Todavía no hay productos.</td>
                         </tr>
                     @endforelse
                 </tbody>

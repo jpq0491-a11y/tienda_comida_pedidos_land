@@ -22,6 +22,8 @@ class StoreProductoRequest extends FormRequest
             'descripcion' => ['nullable', 'string', 'max:500'],
             'precio' => ['required', 'numeric', 'min:0.01', 'max:99999.99'],
             'disponible' => ['boolean'],
+            'etiquetas' => ['nullable', 'array'],
+            'etiquetas.*' => ['integer', 'exists:etiquetas,id'],
         ];
     }
 
@@ -38,6 +40,9 @@ class StoreProductoRequest extends FormRequest
             'precio.min' => 'El precio debe ser mayor a cero.',
             'precio.max' => 'El precio no puede ser mayor a 99,999.99.',
             'disponible.boolean' => 'El valor de "disponible" no es válido.',
+            'etiquetas.array' => 'Las etiquetas no son válidas.',
+            'etiquetas.*.integer' => 'Una de las etiquetas elegidas no es válida.',
+            'etiquetas.*.exists' => 'Una de las etiquetas elegidas no existe.',
         ];
     }
 }

@@ -44,6 +44,28 @@
     </div>
 </div>
 
+<div class="mb-3">
+    <label for="etiquetas" class="form-label">Etiquetas <span class="text-muted">(opcional)</span></label>
+    {{-- name="etiquetas[]": los corchetes hacen que lleguen como arreglo --}}
+    <select id="etiquetas" name="etiquetas[]" multiple size="{{ max(3, min($etiquetas->count(), 6)) }}"
+        class="form-select @error('etiquetas') is-invalid @enderror @error('etiquetas.*') is-invalid @enderror">
+        @foreach ($etiquetas as $etiqueta)
+            {{-- Si la validación falla se usan las que se habían elegido (old); si no, las que ya tiene el producto --}}
+            <option value="{{ $etiqueta->id }}"
+                @selected(in_array($etiqueta->id, old('etiquetas', $producto->etiquetas->pluck('id')->all())))>
+                {{ $etiqueta->descripcion }}
+            </option>
+        @endforeach
+    </select>
+    <div class="form-text">Mantén presionada la tecla Ctrl (Cmd en Mac) para elegir varias o quitar una.</div>
+    @error('etiquetas')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+    @error('etiquetas.*')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
 <div class="form-check mb-3">
     {{-- Si la casilla no se marca, el navegador no la envía; el campo oculto manda 0 en ese caso --}}
     <input type="hidden" name="disponible" value="0">
