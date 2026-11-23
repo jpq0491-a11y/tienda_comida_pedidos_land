@@ -19,7 +19,8 @@
 </head>
 {{-- d-flex + flex-column + min-vh-100 mantienen el footer abajo aunque haya poco contenido --}}
 <body class="d-flex flex-column min-vh-100">
-    {{-- Aquí irá la navbar de la tienda --}}
+    <x-navbar-tienda />
+
 
     <main class="flex-grow-1">
         {{-- Mensajes flash: los usará el carrito y el checkout --}}
@@ -44,7 +45,7 @@
         {{ $slot }}
     </main>
 
-    {{-- Aquí irá el footer de la tienda --}}
+    <x-footer-tienda />
 
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 </body>
