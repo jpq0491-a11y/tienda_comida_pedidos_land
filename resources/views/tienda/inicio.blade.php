@@ -7,9 +7,8 @@
                 <p class="lead fw-normal text-white-50 mb-4">
                     Pide en línea y recoge en sucursal o recíbelo en tu casa.
                 </p>
-                {{-- En la Etapa 4 el primer botón apuntará a la página del menú --}}
                 <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
-                    <a class="btn btn-tienda btn-lg px-4" href="#destacados">Ver platillos</a>
+                    <a class="btn btn-tienda btn-lg px-4" href="{{ route('menu') }}">Ver menú</a>
                     <a class="btn btn-outline-light btn-lg px-4" href="#como-pedir">¿Cómo pedir?</a>
                 </div>
             </div>
@@ -50,26 +49,12 @@
                 <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-sm-2 row-cols-xl-4 justify-content-center">
                     @foreach ($destacados as $producto)
                         <div class="col mb-5">
-                            <div class="card h-100 tarjeta-producto">
-                                @if ($producto->imagen)
-                                    <img class="card-img-top" src="{{ asset('storage/'.$producto->imagen) }}"
-                                        alt="{{ $producto->nombre }}">
-                                @else
-                                    {{-- Los productos del seeder no tienen imagen: se muestra un ícono --}}
-                                    <div class="card-img-top sin-imagen d-flex align-items-center justify-content-center">
-                                        <i class="bi bi-egg-fried display-4"></i>
-                                    </div>
-                                @endif
-                                <div class="card-body p-4 text-center">
-                                    <span class="badge text-bg-warning mb-2">{{ $producto->categoria->nombre }}</span>
-                                    <h5 class="fw-bolder">{{ $producto->nombre }}</h5>
-                                    <p class="text-body-secondary small mb-2">{{ $producto->descripcion }}</p>
-                                    <span class="fs-5 precio">${{ number_format($producto->precio, 2) }}</span>
-                                </div>
-                                {{-- En la Etapa 4 aquí irá el botón "Agregar al carrito" --}}
-                            </div>
+                            <x-tarjeta-producto :producto="$producto" />
                         </div>
                     @endforeach
+                </div>
+                <div class="text-center">
+                    <a class="btn btn-outline-tienda" href="{{ route('menu') }}">Ver menú completo</a>
                 </div>
             </div>
         </section>

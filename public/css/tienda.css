@@ -127,6 +127,17 @@ section[id] {
     color: var(--tienda-primario);
 }
 
+/* Producto agotado: se ve en gris y no se levanta al pasar el mouse */
+.tarjeta-producto.agotado {
+    opacity: 0.6;
+    filter: grayscale(100%);
+}
+
+.tarjeta-producto.agotado:hover {
+    transform: none;
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
+}
+
 .precio {
     color: var(--tienda-primario);
     font-weight: 700;

@@ -16,7 +16,11 @@
                         @if (request()->routeIs('home')) aria-current="page" @endif
                         href="{{ route('home') }}">Inicio</a>
                 </li>
-                {{-- Aquí se agregará "Menú" en la Etapa 4 --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('menu') ? 'active' : '' }}"
+                        @if (request()->routeIs('menu')) aria-current="page" @endif
+                        href="{{ route('menu') }}">Menú</a>
+                </li>
             </ul>
 
             <div class="d-flex align-items-center gap-2">
