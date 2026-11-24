@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CarritoRequest;
 use App\Models\Producto;
+use App\Services\Carrito;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -16,28 +17,11 @@ use Illuminate\View\View;
  */
 class CarritoController extends Controller
 {
-    public function index(): View
+    // Laravel crea el objeto Carrito y lo pasa al método (inyección de dependencias)
+    public function index(Carrito $carrito): View
     {
-        $carrito = session('carrito', []);
-
-        // Solo los productos que siguen disponibles (los borrados con SoftDeletes tampoco llegan)
-        $productos = Producto::whereIn('id', array_keys($carrito))
-            ->where('disponible', true)
-            ->orderBy('nombre')
-            ->get();
-
-        // Si algún producto se agotó o se borró desde que se agregó, se quita del carrito
-        if ($productos->count() < count($carrito)) {
-            session(['carrito' => array_intersect_key($carrito, $productos->keyBy('id')->all())]);
-            session()->now('error', 'Algunos productos ya no están disponibles y se quitaron de tu carrito.');
-        }
-
-        // Una línea por producto: el producto, cuántos lleva y cuánto cuestan
-        $lineas = $productos->map(fn (Producto $producto) => [
-            'producto' => $producto,
-            'cantidad' => $carrito[$producto->id],
-            'subtotal' => $producto->precio * $carrito[$producto->id],
-        ]);
+        // Las líneas (producto, cantidad, subtotal) las arma la clase App\Services\Carrito
+        $lineas = $carrito->lineas();
 
         return view('tienda.carrito', [
             'lineas' => $lineas,
