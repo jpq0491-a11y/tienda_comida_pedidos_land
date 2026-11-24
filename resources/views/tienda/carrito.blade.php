@@ -21,6 +21,7 @@
                                         <th scope="col" class="text-end">Precio</th>
                                         <th scope="col" class="text-center">Cantidad</th>
                                         <th scope="col" class="text-end">Subtotal</th>
+                                        <th scope="col"><span class="visually-hidden">Quitar</span></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -28,9 +29,36 @@
                                         <tr>
                                             <td class="fw-bold">{{ $linea['producto']->nombre }}</td>
                                             <td class="text-end">${{ number_format($linea['producto']->precio, 2) }}</td>
-                                            {{-- En el paso 3 aquí irán los controles para cambiar la cantidad y quitar --}}
-                                            <td class="text-center">{{ $linea['cantidad'] }}</td>
+                                            <td class="text-center">
+                                                {{-- Cambiar cantidad: PATCH porque solo modifica un dato --}}
+                                                <form action="{{ route('carrito.actualizar', $linea['producto']) }}" method="POST"
+                                                    class="d-inline-flex gap-1">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <label class="visually-hidden" for="cantidad-{{ $linea['producto']->id }}">
+                                                        Cantidad de {{ $linea['producto']->nombre }}
+                                                    </label>
+                                                    <input type="number" class="form-control form-control-sm text-center" style="width: 4.5rem;"
+                                                        id="cantidad-{{ $linea['producto']->id }}" name="cantidad"
+                                                        value="{{ $linea['cantidad'] }}"
+                                                        min="1" max="{{ config('tienda.maximo_por_producto') }}" required>
+                                                    <button type="submit" class="btn btn-sm btn-outline-tienda" title="Actualizar cantidad">
+                                                        <i class="bi bi-arrow-repeat"></i>
+                                                        <span class="visually-hidden">Actualizar cantidad</span>
+                                                    </button>
+                                                </form>
+                                            </td>
                                             <td class="text-end">${{ number_format($linea['subtotal'], 2) }}</td>
+                                            <td class="text-end">
+                                                <form action="{{ route('carrito.quitar', $linea['producto']) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Quitar del carrito">
+                                                        <i class="bi bi-trash"></i>
+                                                        <span class="visually-hidden">Quitar {{ $linea['producto']->nombre }}</span>
+                                                    </button>
+                                                </form>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>

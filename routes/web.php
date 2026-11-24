@@ -16,6 +16,9 @@ Route::get('/menu', MenuController::class)->name('menu');
 
 // Carrito de invitado (se guarda en la sesión)
 Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index');
+Route::post('/carrito/{producto}', [CarritoController::class, 'agregar'])->name('carrito.agregar');
+Route::patch('/carrito/{producto}', [CarritoController::class, 'actualizar'])->name('carrito.actualizar');
+Route::delete('/carrito/{producto}', [CarritoController::class, 'quitar'])->name('carrito.quitar');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

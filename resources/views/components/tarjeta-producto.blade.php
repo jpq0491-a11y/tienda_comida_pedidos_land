@@ -43,5 +43,21 @@
         <span class="fs-5 precio">${{ number_format($producto->precio, 2) }}</span>
     </div>
 
-    {{-- En el paso 3 de la Etapa 4 aquí irá el botón "Agregar al carrito" (solo si está disponible) --}}
+    {{-- Solo se puede agregar al carrito si está disponible --}}
+    @if ($producto->disponible)
+        <div class="card-footer bg-transparent border-top-0 p-4 pt-0">
+            <form action="{{ route('carrito.agregar', $producto) }}" method="POST"
+                class="d-flex justify-content-center gap-2">
+                @csrf
+                <label class="visually-hidden" for="cantidad-{{ $producto->id }}">Cantidad</label>
+                {{-- Validación HTML5 en el navegador; el servidor vuelve a validar con CarritoRequest --}}
+                <input type="number" class="form-control text-center" style="width: 4.5rem;"
+                    id="cantidad-{{ $producto->id }}" name="cantidad" value="1"
+                    min="1" max="{{ config('tienda.maximo_por_producto') }}" required>
+                <button type="submit" class="btn btn-tienda">
+                    <i class="bi bi-cart-plus"></i> Agregar
+                </button>
+            </form>
+        </div>
+    @endif
 </div>

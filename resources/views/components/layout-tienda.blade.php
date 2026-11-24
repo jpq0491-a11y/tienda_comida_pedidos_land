@@ -25,9 +25,10 @@
 
 
     <main class="flex-grow-1">
-        {{-- Mensajes flash: los usará el carrito y el checkout --}}
-        @if (session('exito') || session('error'))
+        {{-- Mensajes flash y errores de validación (carrito y checkout) --}}
+        @if (session('exito') || session('error') || $errors->any())
             <div class="container pt-4">
+                <x-errores-formulario />
                 @if (session('exito'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('exito') }}

@@ -15,4 +15,7 @@ return [
         'Domingo' => '10:00 a 18:00',
     ],
 
+    // Cuántas piezas de un mismo producto se pueden tener en el carrito
+    'maximo_por_producto' => 20,
+
 ];
