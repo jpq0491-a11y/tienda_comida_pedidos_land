@@ -24,7 +24,10 @@
             </ul>
 
             <div class="d-flex align-items-center gap-2">
-                {{-- Aquí irá el botón del carrito con su contador (Etapa 4) --}}
+                {{-- En el paso 4 de la Etapa 4 se le agrega el contador de productos --}}
+                <a class="btn btn-tienda btn-sm" href="{{ route('carrito.index') }}">
+                    <i class="bi bi-cart3"></i> Carrito
+                </a>
 
                 {{-- Si el administrador navega la tienda, tiene un atajo de regreso al panel --}}
                 @can('administrar')

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\MenuController;
@@ -12,6 +13,9 @@ Route::get('/', InicioController::class)->name('home');
 
 // Menú público agrupado por categoría
 Route::get('/menu', MenuController::class)->name('menu');
+
+// Carrito de invitado (se guarda en la sesión)
+Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
