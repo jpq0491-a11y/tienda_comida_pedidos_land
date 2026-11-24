@@ -24,9 +24,16 @@
             </ul>
 
             <div class="d-flex align-items-center gap-2">
-                {{-- En el paso 4 de la Etapa 4 se le agrega el contador de productos --}}
+                {{-- Contador: suma las cantidades del carrito en la sesión ([id => cantidad]) --}}
+                @php($piezasEnCarrito = array_sum(session('carrito', [])))
                 <a class="btn btn-tienda btn-sm" href="{{ route('carrito.index') }}">
                     <i class="bi bi-cart3"></i> Carrito
+                    @if ($piezasEnCarrito > 0)
+                        <span class="badge rounded-pill bg-light text-dark ms-1">
+                            {{ $piezasEnCarrito }}
+                            <span class="visually-hidden">productos en el carrito</span>
+                        </span>
+                    @endif
                 </a>
 
                 {{-- Si el administrador navega la tienda, tiene un atajo de regreso al panel --}}
