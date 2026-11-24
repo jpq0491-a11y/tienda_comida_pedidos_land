@@ -3,8 +3,8 @@
         <div class="container px-4 px-lg-5">
             <h1 class="fw-bolder mb-4"><i class="bi bi-bag-check text-tienda"></i> Confirmar pedido</h1>
 
-            {{-- En el paso 2 este formulario se manda a checkout.store (method="POST" + @csrf) --}}
-            <form id="formulario-checkout">
+            <form id="formulario-checkout" action="{{ route('checkout.store') }}" method="POST">
+                @csrf
                 <div class="row g-4">
                     {{-- Datos del cliente --}}
                     <div class="col-lg-7">
@@ -13,23 +13,35 @@
 
                             <div class="mb-3">
                                 <label for="nombre_cliente" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="nombre_cliente" name="nombre_cliente"
+                                <input type="text" class="form-control @error('nombre_cliente') is-invalid @enderror"
+                                    id="nombre_cliente" name="nombre_cliente"
                                     value="{{ old('nombre_cliente') }}" maxlength="100" autocomplete="name" required>
+                                @error('nombre_cliente')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-3">
                                 <label for="telefono" class="form-label">Teléfono</label>
                                 {{-- pattern: exactamente 10 dígitos; el servidor lo vuelve a validar --}}
-                                <input type="tel" class="form-control" id="telefono" name="telefono"
+                                <input type="tel" class="form-control @error('telefono') is-invalid @enderror"
+                                    id="telefono" name="telefono"
                                     value="{{ old('telefono') }}" pattern="[0-9]{10}" maxlength="10" inputmode="numeric"
                                     autocomplete="tel" aria-describedby="ayuda-telefono" required>
+                                @error('telefono')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                                 <div id="ayuda-telefono" class="form-text">10 dígitos, sin espacios. Te llamamos si hay algún problema con tu pedido.</div>
                             </div>
 
                             <div>
                                 <label for="notas" class="form-label">Notas <span class="text-body-secondary">(opcional)</span></label>
-                                <textarea class="form-control" id="notas" name="notas" rows="3" maxlength="500"
+                                <textarea class="form-control @error('notas') is-invalid @enderror" id="notas" name="notas"
+                                    rows="3" maxlength="500"
                                     placeholder="Por ejemplo: sin cebolla, salsa aparte...">{{ old('notas') }}</textarea>
+                                @error('notas')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 
@@ -68,8 +80,7 @@
                                 <span class="precio">${{ number_format($total, 2) }}</span>
                             </div>
 
-                            {{-- Se habilita en el paso 2, cuando ya se guarde el pedido --}}
-                            <button type="submit" class="btn btn-tienda w-100 mb-2" disabled>Confirmar pedido</button>
+                            <button type="submit" class="btn btn-tienda w-100 mb-2">Confirmar pedido</button>
                             <a class="btn btn-outline-tienda w-100" href="{{ route('carrito.index') }}">Modificar carrito</a>
                         </div>
                     </div>

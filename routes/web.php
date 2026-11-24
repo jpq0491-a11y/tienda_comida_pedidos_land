@@ -23,6 +23,7 @@ Route::delete('/carrito/{producto}', [CarritoController::class, 'quitar'])->name
 
 // Checkout: datos del cliente y confirmación del pedido
 Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
+Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

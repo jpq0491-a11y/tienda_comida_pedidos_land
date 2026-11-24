@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePedidoRequest;
+use App\Models\Pedido;
 use App\Models\Sucursal;
 use App\Services\Carrito;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
@@ -27,5 +31,69 @@ class CheckoutController extends Controller
             'total' => $lineas->sum('subtotal'),
             'sucursal' => Sucursal::first(),
         ]);
+    }
+
+    public function store(StorePedidoRequest $request, Carrito $carrito): RedirectResponse
+    {
+        $productosAntes = count(session('carrito', []));
+        $lineas = $carrito->lineas();
+
+        if ($lineas->isEmpty()) {
+            return redirect()->route('carrito.index')
+                ->with('error', 'Tu carrito está vacío. Agrega platillos antes de hacer tu pedido.');
+        }
+
+        // Si algo se agotó mientras llenaba el formulario, el total cambió: que lo revise antes de pedir
+        if ($lineas->count() < $productosAntes) {
+            return redirect()->route('checkout.create')->withInput()
+                ->with('error', 'Algunos productos se agotaron y se quitaron de tu pedido. Revisa el total antes de confirmar.');
+        }
+
+        // DB::transaction no es una consulta: agrupa el pedido y sus productos para que se guarden
+        // todos o ninguno. Si algo falla a la mitad, no queda un pedido sin productos.
+        $pedido = DB::transaction(function () use ($request, $lineas) {
+            // Datos del formulario (ya validados) + los que decide el servidor
+            $pedido = Pedido::create(array_merge($request->validated(), [
+                'folio' => $this->generarFolio(),
+                'user_id' => null, // en la Etapa 8 se liga a la cuenta del cliente si inició sesión
+                'sucursal_id' => Sucursal::firstOrFail()->id,
+                'tipo_entrega' => 'recoger', // la entrega a domicilio llega en la Etapa 6
+                'metodo_pago' => 'efectivo',
+                'total' => $lineas->sum('subtotal'),
+                'estado' => 'pendiente',
+            ]));
+
+            // attach llena la tabla pivote detalle_pedidos con los datos extra de cada producto.
+            // El precio se copia: si mañana cambia, el pedido sigue mostrando lo que se cobró.
+            foreach ($lineas as $linea) {
+                $pedido->productos()->attach($linea['producto']->id, [
+                    'cantidad' => $linea['cantidad'],
+                    'precio_unitario' => $linea['producto']->precio,
+                    'subtotal' => $linea['subtotal'],
+                ]);
+            }
+
+            return $pedido;
+        });
+
+        // El pedido ya está guardado: se vacía el carrito
+        session()->forget('carrito');
+
+        // En el paso 4 esto lleva a la página de confirmación con el folio
+        return redirect()->route('home')
+            ->with('exito', "¡Recibimos tu pedido! Tu folio es {$pedido->folio}.");
+    }
+
+    /**
+     * Folio corto y difícil de adivinar, por ejemplo SC-7K2M9QXA ("SC" de Sabor de Casa).
+     * Se usará en la URL de la página de confirmación.
+     */
+    private function generarFolio(): string
+    {
+        do {
+            $folio = 'SC-'.Str::upper(Str::random(8));
+        } while (Pedido::where('folio', $folio)->exists());
+
+        return $folio;
     }
 }
