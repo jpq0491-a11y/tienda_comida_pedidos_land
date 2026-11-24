@@ -26,6 +26,7 @@ dataset('rutas del panel', [
     'productos: listado' => ['get', 'admin.productos.index', null],
     'productos: crear' => ['get', 'admin.productos.create', null],
     'productos: guardar' => ['post', 'admin.productos.store', null],
+    'productos: detalle' => ['get', 'admin.productos.show', 'producto'],
     'productos: editar' => ['get', 'admin.productos.edit', 'producto'],
     'productos: actualizar' => ['put', 'admin.productos.update', 'producto'],
     'productos: borrar' => ['delete', 'admin.productos.destroy', 'producto'],
@@ -67,6 +68,7 @@ test('el admin sí entra a las páginas del panel', function (string $ruta, ?str
     'categorías: editar' => ['admin.categorias.edit', 'categoria'],
     'productos: listado' => ['admin.productos.index', null],
     'productos: crear' => ['admin.productos.create', null],
+    'productos: detalle' => ['admin.productos.show', 'producto'],
     'productos: editar' => ['admin.productos.edit', 'producto'],
 ]);
 

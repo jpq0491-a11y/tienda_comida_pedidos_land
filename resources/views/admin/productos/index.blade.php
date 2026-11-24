@@ -33,7 +33,9 @@
                                     </div>
                                 @endif
                             </td>
-                            <td>{{ $producto->nombre }}</td>
+                            <td>
+                                <a href="{{ route('admin.productos.show', $producto) }}">{{ $producto->nombre }}</a>
+                            </td>
                             {{-- La categoría ya viene cargada por el with('categoria') del controlador --}}
                             <td>{{ $producto->categoria->nombre }}</td>
                             {{-- Las etiquetas también vienen cargadas por el with() --}}
@@ -53,6 +55,9 @@
                                 @endif
                             </td>
                             <td class="text-end text-nowrap">
+                                <a href="{{ route('admin.productos.show', $producto) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> Ver
+                                </a>
                                 <a href="{{ route('admin.productos.edit', $producto) }}" class="btn btn-sm btn-outline-secondary">
                                     <i class="bi bi-pencil"></i> Editar
                                 </a>

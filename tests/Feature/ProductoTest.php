@@ -78,6 +78,39 @@ test('el admin ve el listado con categoría y etiquetas', function () {
         ->assertSee('Picante');
 });
 
+test('el admin ve el detalle de un producto con su categoría, etiquetas e imagen', function () {
+    // Dado
+    $imagen = UploadedFile::fake()->image('torta.jpg')->store('productos', 'public');
+    $producto = Producto::factory()->for($this->categoria)->create([
+        'nombre' => 'Torta de milanesa',
+        'descripcion' => 'Con aguacate y frijoles',
+        'precio' => '65.00',
+        'imagen' => $imagen,
+    ]);
+    $producto->etiquetas()->attach(Etiqueta::create(['descripcion' => 'Picante']));
+
+    // Cuando
+    $respuesta = $this->actingAs($this->admin)->get(route('admin.productos.show', $producto));
+
+    // Entonces
+    $respuesta->assertOk()
+        ->assertSee('Torta de milanesa')
+        ->assertSee('Con aguacate y frijoles')
+        ->assertSee('$65.00')
+        ->assertSee($this->categoria->nombre)
+        ->assertSee('Picante')
+        ->assertSee(Storage::url($imagen));
+});
+
+test('el detalle de un producto borrado da 404', function () {
+    // Dado: un producto con soft delete
+    $producto = Producto::factory()->create();
+    $producto->delete();
+
+    // Cuando / Entonces: la ruta no encuentra productos borrados
+    $this->actingAs($this->admin)->get(route('admin.productos.show', $producto))->assertNotFound();
+});
+
 test('el admin ve los formularios de crear y editar', function () {
     $producto = Producto::factory()->create();
 

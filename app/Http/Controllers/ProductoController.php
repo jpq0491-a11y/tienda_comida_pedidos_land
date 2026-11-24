@@ -49,6 +49,14 @@ class ProductoController extends Controller
             ->with('exito', 'Producto creado correctamente.');
     }
 
+    public function show(Producto $producto)
+    {
+        // load() trae la categoría y las etiquetas del producto que ya se buscó por la ruta
+        $producto->load(['categoria', 'etiquetas']);
+
+        return view('admin.productos.detalle', compact('producto'));
+    }
+
     public function edit(Producto $producto)
     {
         $categorias = Categoria::orderBy('orden')->get();

@@ -25,7 +25,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'can:administrar'])->prefix('admin')->name('admin.')->group(function () {
     Route::view('/', 'admin.inicio')->name('inicio');
     Route::resource('categorias', CategoriaController::class)->except('show');
-    Route::resource('productos', ProductoController::class)->except('show');
+    // CRUD completo (con show), como pide la rúbrica
+    Route::resource('productos', ProductoController::class);
 
     // Aquí irá el panel de pedidos
 });
