@@ -16,6 +16,8 @@
     {{-- Mismo Bootstrap local que el panel admin (no se usa @vite aquí) --}}
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/bootstrap-icons.min.css') }}">
+    {{-- Estilos propios: van después de Bootstrap para poder sobrescribirlo --}}
+    <link rel="stylesheet" href="{{ asset('css/tienda.css') }}">
 </head>
 {{-- d-flex + flex-column + min-vh-100 mantienen el footer abajo aunque haya poco contenido --}}
 <body class="d-flex flex-column min-vh-100">

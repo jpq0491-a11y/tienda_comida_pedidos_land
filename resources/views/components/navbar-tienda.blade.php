@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+<nav class="navbar navbar-expand-lg navbar-tienda border-bottom sticky-top">
     <div class="container px-4 px-lg-5">
         <a class="navbar-brand fw-bolder" href="{{ route('home') }}">
             <i class="bi bi-shop"></i> {{ config('app.name') }}
@@ -24,7 +24,7 @@
 
                 {{-- Si el administrador navega la tienda, tiene un atajo de regreso al panel --}}
                 @can('administrar')
-                    <a class="btn btn-outline-dark btn-sm" href="{{ route('admin.inicio') }}">
+                    <a class="btn btn-outline-tienda btn-sm" href="{{ route('admin.inicio') }}">
                         <i class="bi bi-speedometer2"></i> Panel
                     </a>
                 @endcan

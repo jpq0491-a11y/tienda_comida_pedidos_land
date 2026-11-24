@@ -1,0 +1,144 @@
+/*
+ * Estilos propios de la tienda pública (Sabor de Casa).
+ * Se carga DESPUÉS de Bootstrap en layout-tienda para poder sobrescribirlo.
+ * El panel admin no usa este archivo.
+ */
+
+/* Colores del negocio: se cambian aquí y se aplican en toda la tienda */
+:root {
+    --tienda-primario: #b5452a;        /* terracota */
+    --tienda-primario-oscuro: #8f3520;
+    --tienda-acento: #f2a541;          /* mostaza */
+    --tienda-crema: #fbf6ef;
+    --tienda-cafe: #2b1d16;
+}
+
+/* Fondo general crema en lugar de blanco */
+body {
+    background-color: var(--tienda-crema);
+}
+
+/* ---------- Utilidades de color ---------- */
+.text-tienda {
+    color: var(--tienda-primario) !important;
+}
+
+.bg-tienda-cafe {
+    background-color: var(--tienda-cafe) !important;
+}
+
+/* Botón principal con el color del negocio (en lugar de .btn-primary azul).
+   Bootstrap 5.3 permite cambiar los colores del botón con sus variables --bs-btn-* */
+.btn-tienda {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--tienda-primario);
+    --bs-btn-border-color: var(--tienda-primario);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--tienda-primario-oscuro);
+    --bs-btn-hover-border-color: var(--tienda-primario-oscuro);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--tienda-primario-oscuro);
+    --bs-btn-active-border-color: var(--tienda-primario-oscuro);
+    --bs-btn-focus-shadow-rgb: 181, 69, 42;
+}
+
+.btn-outline-tienda {
+    --bs-btn-color: var(--tienda-primario);
+    --bs-btn-border-color: var(--tienda-primario);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--tienda-primario);
+    --bs-btn-hover-border-color: var(--tienda-primario);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--tienda-primario-oscuro);
+    --bs-btn-active-border-color: var(--tienda-primario-oscuro);
+    --bs-btn-focus-shadow-rgb: 181, 69, 42;
+}
+
+/* ---------- Navbar ---------- */
+.navbar-tienda {
+    background-color: #fff;
+}
+
+.navbar-tienda .navbar-brand {
+    color: var(--tienda-primario);
+}
+
+.navbar-tienda .nav-link:hover,
+.navbar-tienda .nav-link.active {
+    color: var(--tienda-primario);
+}
+
+/* La navbar es sticky-top: al ir a #como-pedir o #destacados el título
+   no queda escondido debajo de ella */
+section[id] {
+    scroll-margin-top: 4.5rem;
+}
+
+/* ---------- Hero ---------- */
+/* Degradado oscuro encima de un fondo de color. Para usar una foto,
+   guárdala en public/images/hero.jpg y agrega como última capa:
+   url('../images/hero.jpg') center / cover no-repeat */
+.hero-tienda {
+    background:
+        linear-gradient(rgba(43, 29, 22, 0.75), rgba(43, 29, 22, 0.85)),
+        radial-gradient(circle at 20% 30%, var(--tienda-acento), transparent 45%),
+        radial-gradient(circle at 80% 70%, var(--tienda-primario), transparent 50%),
+        var(--tienda-cafe);
+}
+
+.hero-tienda h1 span {
+    color: var(--tienda-acento);
+}
+
+/* ---------- Pasos de "¿Cómo pedir?" ---------- */
+.icono-paso {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background-color: rgba(181, 69, 42, 0.1);
+    color: var(--tienda-primario);
+    font-size: 2.25rem;
+}
+
+/* ---------- Tarjetas de productos ---------- */
+.tarjeta-producto {
+    border: 0;
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Al pasar el mouse la tarjeta se levanta un poco */
+.tarjeta-producto:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15);
+}
+
+/* Todas las imágenes del mismo alto aunque tengan tamaños distintos */
+.tarjeta-producto .card-img-top {
+    height: 180px;
+    object-fit: cover;
+}
+
+.tarjeta-producto .sin-imagen {
+    background-color: rgba(242, 165, 65, 0.2);
+    color: var(--tienda-primario);
+}
+
+.precio {
+    color: var(--tienda-primario);
+    font-weight: 700;
+}
+
+/* Las personas que piden menos animación en su sistema no ven el movimiento */
+@media (prefers-reduced-motion: reduce) {
+    .tarjeta-producto {
+        transition: none;
+    }
+
+    .tarjeta-producto:hover {
+        transform: none;
+    }
+}
