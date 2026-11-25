@@ -17,7 +17,10 @@
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/bootstrap-icons.min.css') }}">
     {{-- Estilos propios: van después de Bootstrap para poder sobrescribirlo --}}
-    <link rel="stylesheet" href="{{ asset('css/tienda.css') }}">
+    {{-- ?v=fecha de modificación: si el archivo cambia, cambia la URL y el navegador no usa la copia vieja --}}
+    <link rel="stylesheet" href="{{ asset('css/tienda.css') }}?v={{ filemtime(public_path('css/tienda.css')) }}">
+    {{-- Estilos propios de cada página: se pasan con <x-slot:estilos> (por ejemplo, el mapa del checkout) --}}
+    {{ $estilos ?? '' }}
 </head>
 {{-- d-flex + flex-column + min-vh-100 mantienen el footer abajo aunque haya poco contenido --}}
 <body class="d-flex flex-column min-vh-100">

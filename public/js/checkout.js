@@ -4,8 +4,10 @@
  *    si sale a modificar el carrito y regresa.
  *    - sessionStorage se borra al cerrar la pestaña (no deja datos en computadoras compartidas).
  *    - Nada se manda al servidor hasta que el cliente confirma el pedido.
- * 2. Muestra la dirección y "¿con cuánto pagas?" solo si elige entrega a domicilio.
+ * 2. Muestra la dirección, el mapa y "¿con cuánto pagas?" solo si elige entrega a domicilio.
  * 3. Calcula el cambio en vivo. Es solo un aviso: el servidor vuelve a validar la cantidad.
+ * 4. Mapa (Leaflet + OpenStreetMap): el cliente marca su casa con un clic o con
+ *    "Usar mi ubicación" y se llenan los inputs hidden latitud y longitud.
  */
 (function () {
     const formulario = document.getElementById('formulario-checkout');
@@ -18,7 +20,8 @@
     const CLAVE = 'borrador-checkout';
     const CAMPOS = [
         'nombre_cliente', 'telefono', 'notas',
-        'calle', 'numero_exterior', 'numero_interior', 'colonia', 'referencia', 'paga_con',
+        'calle', 'numero_exterior', 'numero_interior', 'colonia', 'referencia',
+        'latitud', 'longitud', 'paga_con',
     ];
 
     const datosDomicilio = document.getElementById('datos-domicilio');
@@ -26,6 +29,14 @@
     const camposRequeridos = datosDomicilio.querySelectorAll('[data-requerido]');
     const pagaCon = formulario.elements['paga_con'];
     const cambio = document.getElementById('cambio');
+
+    const contenedorMapa = document.getElementById('mapa-entrega');
+    const latitud = formulario.elements['latitud'];
+    const longitud = formulario.elements['longitud'];
+    const botonUbicacion = document.getElementById('usar-mi-ubicacion');
+    const avisoUbicacion = document.getElementById('aviso-ubicacion');
+    let mapa = null;
+    let marcador = null;
 
     // Se trabaja en centavos (enteros): 0.1 + 0.2 en JavaScript da 0.30000000000000004
     const totalCentavos = Math.round(parseFloat(formulario.dataset.total) * 100);
@@ -68,8 +79,10 @@
             campo.required = domicilio;
         });
 
-        // En sucursal no se pregunta con cuánto paga: se vacía para que no se mande
-        if (!domicilio) {
+        if (domicilio) {
+            crearMapa();
+        } else {
+            // En sucursal no se pregunta con cuánto paga: se vacía para que no se mande
             pagaCon.value = '';
             calcularCambio();
         }
@@ -97,7 +110,103 @@
         }
     }
 
-    // 1. Al abrir la página se llenan los campos con el borrador.
+    /* ---------- Mapa ---------- */
+
+    function avisar(texto, esError) {
+        avisoUbicacion.textContent = texto;
+        avisoUbicacion.classList.toggle('text-danger', esError === true);
+    }
+
+    // El mapa se crea la primera vez que se muestra: si se crea dentro de un div oculto,
+    // Leaflet no sabe su tamaño y se ve cortado
+    function crearMapa() {
+        // L es Leaflet; si no cargó (sin internet, por ejemplo) o no hay sucursal, no hay mapa
+        if (!contenedorMapa || typeof L === 'undefined') {
+            return;
+        }
+
+        if (mapa) {
+            mapa.invalidateSize(); // por si se ocultó y se volvió a mostrar
+            return;
+        }
+
+        const sucursal = L.latLng(parseFloat(contenedorMapa.dataset.latitud), parseFloat(contenedorMapa.dataset.longitud));
+        mapa = L.map(contenedorMapa).setView(sucursal, 13);
+
+        // Imágenes del mapa de OpenStreetMap; su licencia pide mostrar el crédito
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        }).addTo(mapa);
+
+        // La sucursal con un círculo de los colores de la tienda, distinto al marcador del cliente
+        L.circleMarker(sucursal, { radius: 9, color: '#8f3520', fillColor: '#b5452a', fillOpacity: 1 })
+            .addTo(mapa)
+            .bindTooltip(contenedorMapa.dataset.sucursal);
+
+        mapa.on('click', function (evento) {
+            colocarMarcador(evento.latlng);
+        });
+
+        // Si ya había un punto (borrador u old() tras un error), se vuelve a poner
+        if (latitud.value !== '' && longitud.value !== '') {
+            const punto = L.latLng(parseFloat(latitud.value), parseFloat(longitud.value));
+            colocarMarcador(punto);
+            mapa.setView(punto, 15);
+        }
+    }
+
+    function colocarMarcador(punto) {
+        // wrap(): si el mapa se movió "una vuelta al mundo", deja la longitud entre -180 y 180
+        punto = punto.wrap();
+
+        if (marcador) {
+            marcador.setLatLng(punto);
+        } else {
+            // draggable: el cliente puede arrastrarlo para ajustar
+            marcador = L.marker(punto, { draggable: true, title: 'Lugar de entrega' }).addTo(mapa);
+            marcador.on('dragend', function () {
+                colocarMarcador(marcador.getLatLng());
+            });
+        }
+
+        // 7 decimales, como la columna decimal(10, 7) de la base de datos
+        latitud.value = punto.lat.toFixed(7);
+        longitud.value = punto.lng.toFixed(7);
+        avisar('Ubicación marcada.');
+
+        // Los inputs hidden no disparan el evento input: se guarda a mano
+        guardarBorrador();
+    }
+
+    function usarMiUbicacion() {
+        if (!mapa) {
+            return;
+        }
+
+        // Solo funciona en páginas seguras (https o localhost) y si el cliente da permiso
+        if (!navigator.geolocation) {
+            avisar('Tu navegador no puede darnos tu ubicación. Márcala con un clic en el mapa.', true);
+            return;
+        }
+
+        avisar('Buscando tu ubicación...');
+        navigator.geolocation.getCurrentPosition(
+            function (posicion) {
+                const punto = L.latLng(posicion.coords.latitude, posicion.coords.longitude);
+                colocarMarcador(punto);
+                mapa.setView(punto, 16);
+            },
+            function () {
+                avisar('No pudimos obtener tu ubicación (revisa el permiso del navegador). Márcala con un clic en el mapa.', true);
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+
+    /* ---------- Al abrir la página ---------- */
+
+    // 1. Se llenan los campos con el borrador.
     //    Si el campo ya trae valor (old() después de un error de validación), ese tiene prioridad.
     const borrador = leerBorrador();
     CAMPOS.forEach(function (nombre) {
@@ -125,10 +234,19 @@
     });
     pagaCon.addEventListener('input', calcularCambio);
     formulario.addEventListener('input', guardarBorrador);
+    botonUbicacion.addEventListener('click', usarMiUbicacion);
 
-    // 3. Al confirmar el pedido ya no hace falta el borrador.
-    //    Si el servidor rechaza los datos, old() los vuelve a poner en los campos.
-    formulario.addEventListener('submit', function () {
+    // 3. Al confirmar: los inputs hidden no se pueden marcar como required, así que aquí se revisa
+    //    que haya un punto en el mapa (el servidor lo vuelve a validar).
+    formulario.addEventListener('submit', function (evento) {
+        if (esDomicilio() && mapa && (latitud.value === '' || longitud.value === '')) {
+            evento.preventDefault();
+            avisar('Marca en el mapa dónde te entregamos tu pedido.', true);
+            contenedorMapa.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        // Ya no hace falta el borrador. Si el servidor rechaza los datos, old() los vuelve a poner.
         try {
             sessionStorage.removeItem(CLAVE);
         } catch (error) {

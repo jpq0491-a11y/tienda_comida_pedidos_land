@@ -35,6 +35,9 @@ class StorePedidoRequest extends FormRequest
             'numero_interior' => ['exclude_unless:tipo_entrega,domicilio', 'nullable', 'string', 'max:20'],
             'colonia' => ['exclude_unless:tipo_entrega,domicilio', 'required', 'string', 'max:100'],
             'referencia' => ['exclude_unless:tipo_entrega,domicilio', 'nullable', 'string', 'max:255'],
+            // Vienen de inputs hidden que llena el mapa
+            'latitud' => ['exclude_unless:tipo_entrega,domicilio', 'required', 'numeric', 'between:-90,90'],
+            'longitud' => ['exclude_unless:tipo_entrega,domicilio', 'required', 'numeric', 'between:-180,180'],
             // Opcional: vacío quiere decir que paga con el monto exacto
             'paga_con' => ['exclude_unless:tipo_entrega,domicilio', 'nullable', 'numeric', 'decimal:0,2', 'min:'.$this->total(), 'max:99999'],
             'notas' => ['nullable', 'string', 'max:500'],
@@ -58,6 +61,13 @@ class StorePedidoRequest extends FormRequest
             'colonia.required' => 'Escribe la colonia.',
             'colonia.max' => 'La colonia no puede tener más de 100 caracteres.',
             'referencia.max' => 'La referencia no puede tener más de 255 caracteres.',
+            // Un mismo mensaje para latitud y longitud: para el cliente es un solo dato (el punto en el mapa)
+            'latitud.required' => 'Marca en el mapa dónde te entregamos tu pedido.',
+            'latitud.numeric' => 'La ubicación del mapa no es válida. Vuelve a marcarla.',
+            'latitud.between' => 'La ubicación del mapa no es válida. Vuelve a marcarla.',
+            'longitud.required' => 'Marca en el mapa dónde te entregamos tu pedido.',
+            'longitud.numeric' => 'La ubicación del mapa no es válida. Vuelve a marcarla.',
+            'longitud.between' => 'La ubicación del mapa no es válida. Vuelve a marcarla.',
             'paga_con.numeric' => 'Escribe una cantidad válida, por ejemplo 200.',
             'paga_con.decimal' => 'La cantidad puede tener máximo 2 decimales.',
             'paga_con.min' => 'Debes pagar con al menos el total del pedido ($'.number_format($this->total(), 2).').',

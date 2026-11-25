@@ -143,6 +143,12 @@ section[id] {
     font-weight: 700;
 }
 
+/* Mapa del checkout (Leaflet necesita que el contenedor tenga una altura) */
+.mapa-entrega {
+    height: 300px;
+    border: 1px solid var(--bs-border-color);
+}
+
 /* Las personas que piden menos animación en su sistema no ven el movimiento */
 @media (prefers-reduced-motion: reduce) {
     .tarjeta-producto {

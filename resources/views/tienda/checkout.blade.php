@@ -131,6 +131,29 @@
                                     </div>
                                 </div>
 
+                                {{-- Mapa: el cliente marca su casa y el JS llena latitud y longitud (inputs hidden) --}}
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                        <span class="form-label mb-0" id="etiqueta-mapa">Ubicación en el mapa</span>
+                                        <button type="button" class="btn btn-sm btn-outline-tienda" id="usar-mi-ubicacion">
+                                            <i class="bi bi-crosshair me-1"></i>Usar mi ubicación
+                                        </button>
+                                    </div>
+                                    @if ($sucursal)
+                                        <div id="mapa-entrega" class="mapa-entrega rounded-3" role="application" aria-labelledby="etiqueta-mapa"
+                                            data-latitud="{{ $sucursal->latitud }}" data-longitud="{{ $sucursal->longitud }}"
+                                            data-sucursal="{{ $sucursal->nombre }}"></div>
+                                    @endif
+                                    <input type="hidden" id="latitud" name="latitud" value="{{ old('latitud') }}">
+                                    <input type="hidden" id="longitud" name="longitud" value="{{ old('longitud') }}">
+                                    <div class="form-text">Haz clic en el mapa donde entregamos (puedes arrastrar el marcador para ajustarlo).</div>
+                                    <p id="aviso-ubicacion" class="small mt-1 mb-0" aria-live="polite"></p>
+                                    {{-- Los dos campos son un solo dato para el cliente: se muestra un solo error --}}
+                                    @if ($errors->hasAny(['latitud', 'longitud']))
+                                        <div class="small text-danger mt-1">{{ $errors->first('latitud') ?: $errors->first('longitud') }}</div>
+                                    @endif
+                                </div>
+
                                 <div class="mb-3">
                                     <label for="paga_con" class="form-label">¿Con cuánto pagas? <span class="text-body-secondary">(opcional)</span></label>
                                     <div class="input-group has-validation">
@@ -181,8 +204,14 @@
         </div>
     </section>
 
-    {{-- Borrador del formulario, datos de domicilio y cálculo del cambio en vivo --}}
+    {{-- Leaflet (mapas con OpenStreetMap, sin API key), descargado en public/vendor como Bootstrap --}}
+    <x-slot:estilos>
+        <link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}">
+    </x-slot:estilos>
+
+    {{-- Borrador del formulario, datos de domicilio, cálculo del cambio en vivo y mapa --}}
     <x-slot:scripts>
-        <script src="{{ asset('js/checkout.js') }}"></script>
+        <script src="{{ asset('vendor/leaflet/leaflet.js') }}"></script>
+        <script src="{{ asset('js/checkout.js') }}?v={{ filemtime(public_path('js/checkout.js')) }}"></script>
     </x-slot:scripts>
 </x-layout-tienda>
