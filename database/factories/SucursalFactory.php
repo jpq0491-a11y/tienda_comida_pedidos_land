@@ -21,10 +21,10 @@ class SucursalFactory extends Factory
             'nombre' => 'Sucursal '.fake()->city(),
             'direccion' => fake()->streetAddress(),
             'telefono' => fake()->numerify('55########'),
-            // Coordenadas cerca del centro de la Ciudad de México
-            'latitud' => fake()->latitude(19.30, 19.50),
-            'longitud' => fake()->longitude(-99.25, -99.05),
-            'radio_entrega_km' => 15,
+            // Coordenadas cerca de Ayotlán, Jalisco (donde está la sucursal real)
+            'latitud' => fake()->latitude(20.48, 20.58),
+            'longitud' => fake()->longitude(-102.38, -102.28),
+            'radio_entrega_km' => 3,
         ];
     }
 }

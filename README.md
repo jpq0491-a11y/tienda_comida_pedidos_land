@@ -10,7 +10,7 @@ Proyecto para la materia PPI. Página web de un negocio de comida donde los clie
 | Menú | Productos agrupados por categoría. |
 | Carrito | Carrito de invitado guardado en la sesión, sin necesidad de cuenta. |
 | Checkout | Datos del cliente, tipo de entrega y pago solo en efectivo, con cálculo de cambio. |
-| Entrega a domicilio | Solo se acepta si la dirección está a 15 km o menos de la sucursal (mapa con Leaflet y cálculo con la fórmula de Haversine). |
+| Entrega a domicilio | Solo se acepta si la dirección está a 3 km o menos de la sucursal (mapa con Leaflet y cálculo con la fórmula de Haversine). |
 | Panel admin | Login, CRUD de categorías y productos, lista de pedidos pendientes y realizados, y cambio de estado. |
 
 ## Tecnologías
