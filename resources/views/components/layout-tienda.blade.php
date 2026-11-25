@@ -51,5 +51,7 @@
     <x-footer-tienda />
 
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    {{-- Scripts propios de cada página: se pasan con <x-slot:scripts> (por ejemplo, el checkout) --}}
+    {{ $scripts ?? '' }}
 </body>
 </html>

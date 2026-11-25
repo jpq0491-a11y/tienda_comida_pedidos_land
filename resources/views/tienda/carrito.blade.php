@@ -74,8 +74,7 @@
                                 <span>Total</span>
                                 <span class="precio">${{ number_format($total, 2) }}</span>
                             </div>
-                            {{-- En la Etapa 5 este botón llevará al checkout --}}
-                            <button type="button" class="btn btn-tienda w-100 mb-2" disabled>Continuar con el pedido</button>
+                            <a class="btn btn-tienda w-100 mb-2" href="{{ route('checkout.create') }}">Continuar con el pedido</a>
                             <a class="btn btn-outline-tienda w-100" href="{{ route('menu') }}">Seguir comprando</a>
                         </div>
                     </div>

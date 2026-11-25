@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ProductoController;
@@ -19,6 +20,12 @@ Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index
 Route::post('/carrito/{producto}', [CarritoController::class, 'agregar'])->name('carrito.agregar');
 Route::patch('/carrito/{producto}', [CarritoController::class, 'actualizar'])->name('carrito.actualizar');
 Route::delete('/carrito/{producto}', [CarritoController::class, 'quitar'])->name('carrito.quitar');
+
+// Checkout: datos del cliente y confirmación del pedido
+Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
+Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+// {pedido:folio}: Laravel busca el pedido por su folio en lugar del id (404 si no existe)
+Route::get('/pedido/{pedido:folio}', [CheckoutController::class, 'confirmacion'])->name('pedido.confirmacion');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

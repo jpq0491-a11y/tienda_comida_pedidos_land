@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use Database\Factories\SucursalFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Sucursal extends Model
 {
+    /** @use HasFactory<SucursalFactory> */
+    use HasFactory;
+
     // Laravel pluralizaría "Sucursal" como "sucursals", por eso se indica el nombre de la tabla
     protected $table = 'sucursales';
 
