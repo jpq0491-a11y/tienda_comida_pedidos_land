@@ -79,9 +79,18 @@ class CheckoutController extends Controller
         // El pedido ya está guardado: se vacía el carrito
         session()->forget('carrito');
 
-        // En el paso 4 esto lleva a la página de confirmación con el folio
-        return redirect()->route('home')
-            ->with('exito', "¡Recibimos tu pedido! Tu folio es {$pedido->folio}.");
+        return redirect()->route('pedido.confirmacion', $pedido)
+            ->with('exito', '¡Recibimos tu pedido! Guarda tu folio por si necesitas consultarlo.');
+    }
+
+    /**
+     * Página de confirmación del pedido. La URL usa el folio ({pedido:folio}), no el id:
+     * con el id cualquiera podría ver otros pedidos cambiando el número (/pedido/1, /pedido/2...),
+     * el folio es aleatorio y no se puede adivinar.
+     */
+    public function confirmacion(Pedido $pedido): View
+    {
+        return view('tienda.confirmacion', ['pedido' => $pedido]);
     }
 
     /**

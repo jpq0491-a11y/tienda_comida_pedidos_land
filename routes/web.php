@@ -24,6 +24,8 @@ Route::delete('/carrito/{producto}', [CarritoController::class, 'quitar'])->name
 // Checkout: datos del cliente y confirmación del pedido
 Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+// {pedido:folio}: Laravel busca el pedido por su folio en lugar del id (404 si no existe)
+Route::get('/pedido/{pedido:folio}', [CheckoutController::class, 'confirmacion'])->name('pedido.confirmacion');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
