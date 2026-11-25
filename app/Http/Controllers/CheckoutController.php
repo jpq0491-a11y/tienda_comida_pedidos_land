@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePedidoRequest;
+use App\Mail\PedidoNuevo;
 use App\Models\Pedido;
 use App\Models\Sucursal;
+use App\Models\User;
 use App\Services\Carrito;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Throwable;
 
 /**
  * Checkout: el cliente revisa su pedido y escribe sus datos para confirmarlo.
@@ -79,6 +83,8 @@ class CheckoutController extends Controller
         // El pedido ya está guardado: se vacía el carrito
         session()->forget('carrito');
 
+        $this->avisarAdministradores($pedido);
+
         return redirect()->route('pedido.confirmacion', $pedido)
             ->with('exito', '¡Recibimos tu pedido! Guarda tu folio por si necesitas consultarlo.');
     }
@@ -91,6 +97,26 @@ class CheckoutController extends Controller
     public function confirmacion(Pedido $pedido): View
     {
         return view('tienda.confirmacion', ['pedido' => $pedido]);
+    }
+
+    /**
+     * Manda el correo de pedido nuevo a todos los usuarios con rol admin.
+     * Si el correo falla, el pedido ya está guardado: se registra el error en el log
+     * (storage/logs/laravel.log) y el cliente sigue a su confirmación sin ver nada raro.
+     */
+    private function avisarAdministradores(Pedido $pedido): void
+    {
+        $correos = User::where('rol', 'admin')->pluck('email');
+
+        if ($correos->isEmpty()) {
+            return;
+        }
+
+        try {
+            Mail::to($correos)->send(new PedidoNuevo($pedido));
+        } catch (Throwable $error) {
+            report($error);
+        }
     }
 
     /**
