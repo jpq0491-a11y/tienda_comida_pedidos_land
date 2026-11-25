@@ -7,6 +7,7 @@ use App\Mail\PedidoNuevo;
 use App\Models\Pedido;
 use App\Models\Sucursal;
 use App\Models\User;
+use App\Services\CalculadoraDistancia;
 use App\Services\Carrito;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +38,7 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function store(StorePedidoRequest $request, Carrito $carrito): RedirectResponse
+    public function store(StorePedidoRequest $request, Carrito $carrito, CalculadoraDistancia $calculadora): RedirectResponse
     {
         $productosAntes = count(session('carrito', []));
         $lineas = $carrito->lineas();
@@ -53,15 +54,28 @@ class CheckoutController extends Controller
                 ->with('error', 'Algunos productos se agotaron y se quitaron de tu pedido. Revisa el total antes de confirmar.');
         }
 
+        $sucursal = Sucursal::firstOrFail();
+        $datos = $request->validated();
+
+        // La distancia la calcula el servidor con las coordenadas del mapa: la que muestra el JS
+        // es solo un aviso y se podría alterar. Con "recoger" no hay coordenadas (queda null).
+        $distanciaKm = null;
+        if ($datos['tipo_entrega'] === 'domicilio') {
+            $distanciaKm = round($calculadora->kilometros(
+                $sucursal->latitud, $sucursal->longitud, $datos['latitud'], $datos['longitud']
+            ), 2);
+        }
+
         // DB::transaction no es una consulta: agrupa el pedido y sus productos para que se guarden
         // todos o ninguno. Si algo falla a la mitad, no queda un pedido sin productos.
-        $pedido = DB::transaction(function () use ($request, $lineas) {
-            // Datos del formulario (ya validados, incluye tipo_entrega, y la dirección y paga_con
-            // solo si es a domicilio) + los que decide el servidor
-            $pedido = Pedido::create(array_merge($request->validated(), [
+        $pedido = DB::transaction(function () use ($datos, $lineas, $sucursal, $distanciaKm) {
+            // Datos del formulario (ya validados, incluye tipo_entrega, y la dirección, las coordenadas
+            // y paga_con solo si es a domicilio) + los que decide el servidor
+            $pedido = Pedido::create(array_merge($datos, [
                 'folio' => $this->generarFolio(),
                 'user_id' => null, // en la Etapa 8 se liga a la cuenta del cliente si inició sesión
-                'sucursal_id' => Sucursal::firstOrFail()->id,
+                'sucursal_id' => $sucursal->id,
+                'distancia_km' => $distanciaKm,
                 'metodo_pago' => 'efectivo',
                 'total' => round($lineas->sum('subtotal'), 2),
                 'estado' => 'pendiente',

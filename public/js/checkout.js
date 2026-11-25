@@ -37,6 +37,8 @@
     const avisoUbicacion = document.getElementById('aviso-ubicacion');
     let mapa = null;
     let marcador = null;
+    let ubicacionSucursal = null;
+    const formatoKm = new Intl.NumberFormat('es-MX', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
     // Se trabaja en centavos (enteros): 0.1 + 0.2 en JavaScript da 0.30000000000000004
     const totalCentavos = Math.round(parseFloat(formulario.dataset.total) * 100);
@@ -130,8 +132,8 @@
             return;
         }
 
-        const sucursal = L.latLng(parseFloat(contenedorMapa.dataset.latitud), parseFloat(contenedorMapa.dataset.longitud));
-        mapa = L.map(contenedorMapa).setView(sucursal, 13);
+        ubicacionSucursal = L.latLng(parseFloat(contenedorMapa.dataset.latitud), parseFloat(contenedorMapa.dataset.longitud));
+        mapa = L.map(contenedorMapa).setView(ubicacionSucursal, 13);
 
         // Imágenes del mapa de OpenStreetMap; su licencia pide mostrar el crédito
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -140,7 +142,7 @@
         }).addTo(mapa);
 
         // La sucursal con un círculo de los colores de la tienda, distinto al marcador del cliente
-        L.circleMarker(sucursal, { radius: 9, color: '#8f3520', fillColor: '#b5452a', fillOpacity: 1 })
+        L.circleMarker(ubicacionSucursal, { radius: 9, color: '#8f3520', fillColor: '#b5452a', fillOpacity: 1 })
             .addTo(mapa)
             .bindTooltip(contenedorMapa.dataset.sucursal);
 
@@ -173,7 +175,11 @@
         // 7 decimales, como la columna decimal(10, 7) de la base de datos
         latitud.value = punto.lat.toFixed(7);
         longitud.value = punto.lng.toFixed(7);
-        avisar('Ubicación marcada.');
+
+        // distanceTo() de Leaflet usa la misma fórmula de Haversine que el servidor y regresa metros.
+        // Es solo un aviso: el servidor la vuelve a calcular con app/Services/CalculadoraDistancia.php
+        const kilometros = ubicacionSucursal.distanceTo(punto) / 1000;
+        avisar('Estás a ' + formatoKm.format(kilometros) + ' km de la sucursal (en línea recta).');
 
         // Los inputs hidden no disparan el evento input: se guarda a mano
         guardarBorrador();
