@@ -23,6 +23,7 @@ beforeEach(function () {
     $this->datos = [
         'nombre_cliente' => 'Ana López',
         'telefono' => '5512345678',
+        'tipo_entrega' => 'recoger',
         'notas' => 'Sin cebolla',
     ];
 });

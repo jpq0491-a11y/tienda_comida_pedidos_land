@@ -6,8 +6,17 @@
 **Fecha:** {{ $pedido->created_at->format('d/m/Y H:i') }}<br>
 **Cliente:** {{ $pedido->nombre_cliente }}<br>
 **Teléfono:** {{ $pedido->telefono }}<br>
+@if ($pedido->tipo_entrega === 'domicilio')
+**Entrega:** A domicilio<br>
+**Dirección:** {{ $pedido->direccion_completa }}<br>
+@if ($pedido->referencia)
+**Referencia:** {{ $pedido->referencia }}<br>
+@endif
+**Pago:** Efectivo, {{ $pedido->cambio !== null ? 'paga con $'.number_format($pedido->paga_con, 2).' (llevar $'.number_format($pedido->cambio, 2).' de cambio)' : 'con el monto exacto' }}
+@else
 **Entrega:** Recoger en {{ $pedido->sucursal->nombre }}<br>
 **Pago:** Efectivo
+@endif
 
 {{-- Las tablas Markdown no deben llevar sangría o se muestran como texto --}}
 <x-mail::table>

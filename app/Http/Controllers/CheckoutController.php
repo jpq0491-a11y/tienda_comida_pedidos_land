@@ -32,7 +32,7 @@ class CheckoutController extends Controller
 
         return view('tienda.checkout', [
             'lineas' => $lineas,
-            'total' => $lineas->sum('subtotal'),
+            'total' => round($lineas->sum('subtotal'), 2),
             'sucursal' => Sucursal::first(),
         ]);
     }
@@ -56,14 +56,14 @@ class CheckoutController extends Controller
         // DB::transaction no es una consulta: agrupa el pedido y sus productos para que se guarden
         // todos o ninguno. Si algo falla a la mitad, no queda un pedido sin productos.
         $pedido = DB::transaction(function () use ($request, $lineas) {
-            // Datos del formulario (ya validados) + los que decide el servidor
+            // Datos del formulario (ya validados, incluye tipo_entrega, y la dirección y paga_con
+            // solo si es a domicilio) + los que decide el servidor
             $pedido = Pedido::create(array_merge($request->validated(), [
                 'folio' => $this->generarFolio(),
                 'user_id' => null, // en la Etapa 8 se liga a la cuenta del cliente si inició sesión
                 'sucursal_id' => Sucursal::firstOrFail()->id,
-                'tipo_entrega' => 'recoger', // la entrega a domicilio llega en la Etapa 6
                 'metodo_pago' => 'efectivo',
-                'total' => $lineas->sum('subtotal'),
+                'total' => round($lineas->sum('subtotal'), 2),
                 'estado' => 'pendiente',
             ]));
 
