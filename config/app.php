@@ -65,7 +65,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // Hora del centro de México: así las fechas de los pedidos salen con la hora local
+    'timezone' => 'America/Mexico_City',
 
     /*
     |--------------------------------------------------------------------------
