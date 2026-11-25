@@ -17,9 +17,10 @@ class SucursalSeeder extends Seeder
             'nombre' => 'Sucursal Centro',
             'direccion' => 'Av. Principal 123, Centro',
             'telefono' => '5512345678',
-            'latitud' => 19.4326,
-            'longitud' => -99.1332,
-            'radio_entrega_km' => 15,
+            // Ayotlán, Jalisco (centro de la ciudad, tomado de Google Maps)
+            'latitud' => 20.5299754,
+            'longitud' => -102.3306392,
+            'radio_entrega_km' => 3,
         ]);
     }
 }

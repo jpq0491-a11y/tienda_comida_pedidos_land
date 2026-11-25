@@ -29,7 +29,7 @@
                     <span class="icono-paso"><i class="bi bi-bicycle"></i></span>
                     <h5 class="fw-bolder mt-3">2. Recoge o pide a domicilio</h5>
                     <p class="text-body-secondary mb-0">
-                        Entregamos hasta {{ $sucursal ? (float) $sucursal->radio_entrega_km : 15 }} km de la sucursal.
+                        Entregamos hasta {{ $sucursal ? (float) $sucursal->radio_entrega_km : 3 }} km de la sucursal.
                     </p>
                 </div>
                 <div class="col-md-4">

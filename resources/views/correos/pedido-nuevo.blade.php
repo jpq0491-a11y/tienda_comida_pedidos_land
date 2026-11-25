@@ -6,8 +6,19 @@
 **Fecha:** {{ $pedido->created_at->format('d/m/Y H:i') }}<br>
 **Cliente:** {{ $pedido->nombre_cliente }}<br>
 **Teléfono:** {{ $pedido->telefono }}<br>
+@if ($pedido->tipo_entrega === 'domicilio')
+**Entrega:** A domicilio<br>
+**Dirección:** {{ $pedido->direccion_completa }}<br>
+@if ($pedido->referencia)
+**Referencia:** {{ $pedido->referencia }}<br>
+@endif
+**Ubicación:** [Ver en Google Maps](https://www.google.com/maps/search/?api=1&query={{ $pedido->latitud }},{{ $pedido->longitud }})
+({{ number_format($pedido->distancia_km, 1) }} km en línea recta desde la sucursal)<br>
+**Pago:** Efectivo, {{ $pedido->cambio !== null ? 'paga con $'.number_format($pedido->paga_con, 2).' (llevar $'.number_format($pedido->cambio, 2).' de cambio)' : 'con el monto exacto' }}
+@else
 **Entrega:** Recoger en {{ $pedido->sucursal->nombre }}<br>
 **Pago:** Efectivo
+@endif
 
 {{-- Las tablas Markdown no deben llevar sangría o se muestran como texto --}}
 <x-mail::table>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -16,7 +17,11 @@ class Pedido extends Model
         'nombre_cliente',
         'telefono',
         'tipo_entrega',
-        'direccion',
+        'calle',
+        'numero_exterior',
+        'numero_interior',
+        'colonia',
+        'referencia',
         'latitud',
         'longitud',
         'distancia_km',
@@ -36,6 +41,30 @@ class Pedido extends Model
             'paga_con' => 'decimal:2',
             'total' => 'decimal:2',
         ];
+    }
+
+    /**
+     * Cambio que hay que llevarle al cliente: $pedido->cambio.
+     * null si no dijo con cuánto paga (paga con el monto exacto o recoge en sucursal).
+     */
+    protected function cambio(): Attribute
+    {
+        return Attribute::get(fn () => $this->paga_con === null
+            ? null
+            : round($this->paga_con - $this->total, 2));
+    }
+
+    /**
+     * Dirección armada en una línea: $pedido->direccion_completa,
+     * por ejemplo "Av. Juárez 120 int. 4, col. Centro". La referencia se muestra aparte.
+     */
+    protected function direccionCompleta(): Attribute
+    {
+        return Attribute::get(fn () => $this->calle === null
+            ? null
+            : $this->calle.' '.$this->numero_exterior
+                .($this->numero_interior ? ' int. '.$this->numero_interior : '')
+                .', col. '.$this->colonia);
     }
 
     // Renglones del pedido (producto, cantidad, precio)

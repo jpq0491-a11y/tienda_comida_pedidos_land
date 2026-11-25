@@ -22,12 +22,7 @@ class Carrito
     public function lineas(): Collection
     {
         $carrito = session('carrito', []);
-
-        // Solo los productos que siguen disponibles (los borrados con SoftDeletes tampoco llegan)
-        $productos = Producto::whereIn('id', array_keys($carrito))
-            ->where('disponible', true)
-            ->orderBy('nombre')
-            ->get();
+        $productos = $this->productosDisponibles($carrito);
 
         if ($productos->count() < count($carrito)) {
             session(['carrito' => array_intersect_key($carrito, $productos->keyBy('id')->all())]);
@@ -40,5 +35,32 @@ class Carrito
             'cantidad' => $carrito[$producto->id],
             'subtotal' => $producto->precio * $carrito[$producto->id],
         ]);
+    }
+
+    /**
+     * Total del carrito SIN modificar la sesión (a diferencia de lineas(), no quita los agotados
+     * ni pone avisos). Lo usa StorePedidoRequest para validar "¿con cuánto pagas?": si quitara
+     * los agotados ahí, el controlador ya no podría darse cuenta de que algo se agotó.
+     */
+    public function total(): float
+    {
+        $carrito = session('carrito', []);
+
+        $total = $this->productosDisponibles($carrito)
+            ->sum(fn (Producto $producto) => $producto->precio * $carrito[$producto->id]);
+
+        // round: con decimales, 179.8 puede quedar como 179.80000000001 y fallaría la regla min
+        return round($total, 2);
+    }
+
+    /**
+     * Productos del carrito que siguen disponibles (los borrados con SoftDeletes tampoco llegan).
+     */
+    private function productosDisponibles(array $carrito): Collection
+    {
+        return Producto::whereIn('id', array_keys($carrito))
+            ->where('disponible', true)
+            ->orderBy('nombre')
+            ->get();
     }
 }
