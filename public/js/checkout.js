@@ -38,6 +38,8 @@
     let mapa = null;
     let marcador = null;
     let ubicacionSucursal = null;
+    let radioKm = null;
+    let fueraDeZona = false;
     const formatoKm = new Intl.NumberFormat('es-MX', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
     // Se trabaja en centavos (enteros): 0.1 + 0.2 en JavaScript da 0.30000000000000004
@@ -114,9 +116,10 @@
 
     /* ---------- Mapa ---------- */
 
-    function avisar(texto, esError) {
+    function avisar(texto, esError, esExito) {
         avisoUbicacion.textContent = texto;
         avisoUbicacion.classList.toggle('text-danger', esError === true);
+        avisoUbicacion.classList.toggle('text-success', esExito === true);
     }
 
     // El mapa se crea la primera vez que se muestra: si se crea dentro de un div oculto,
@@ -133,7 +136,8 @@
         }
 
         ubicacionSucursal = L.latLng(parseFloat(contenedorMapa.dataset.latitud), parseFloat(contenedorMapa.dataset.longitud));
-        mapa = L.map(contenedorMapa).setView(ubicacionSucursal, 13);
+        radioKm = parseFloat(contenedorMapa.dataset.radioKm);
+        mapa = L.map(contenedorMapa);
 
         // Imágenes del mapa de OpenStreetMap; su licencia pide mostrar el crédito
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -142,6 +146,19 @@
         }).addTo(mapa);
 
         // La sucursal con un círculo de los colores de la tienda, distinto al marcador del cliente
+        // Zona de entrega: círculo con el radio de la sucursal (L.circle recibe el radio en metros).
+        // interactive: false para que los clics pasen al mapa y se pueda marcar dentro del círculo
+        L.circle(ubicacionSucursal, {
+            radius: radioKm * 1000,
+            color: '#b5452a',
+            weight: 2,
+            fillOpacity: 0.06,
+            interactive: false,
+        }).addTo(mapa);
+        // Al abrir se ve toda la zona de entrega. toBounds() recibe el ancho del cuadro en metros
+        // (el diámetro). No se usa getBounds() del círculo: ese necesita que el mapa ya tenga vista.
+        mapa.fitBounds(ubicacionSucursal.toBounds(radioKm * 2000));
+
         L.circleMarker(ubicacionSucursal, { radius: 9, color: '#8f3520', fillColor: '#b5452a', fillOpacity: 1 })
             .addTo(mapa)
             .bindTooltip(contenedorMapa.dataset.sucursal);
@@ -179,7 +196,14 @@
         // distanceTo() de Leaflet usa la misma fórmula de Haversine que el servidor y regresa metros.
         // Es solo un aviso: el servidor la vuelve a calcular con app/Services/CalculadoraDistancia.php
         const kilometros = ubicacionSucursal.distanceTo(punto) / 1000;
-        avisar('Estás a ' + formatoKm.format(kilometros) + ' km de la sucursal (en línea recta).');
+        fueraDeZona = kilometros > radioKm;
+
+        if (fueraDeZona) {
+            avisar('Estás a ' + formatoKm.format(kilometros) + ' km: no llegamos hasta ahí (entregamos hasta '
+                + radioKm + ' km). Puedes elegir recoger tu pedido en la sucursal.', true);
+        } else {
+            avisar('Estás a ' + formatoKm.format(kilometros) + ' km de la sucursal: ¡sí llegamos!', false, true);
+        }
 
         // Los inputs hidden no disparan el evento input: se guarda a mano
         guardarBorrador();
@@ -248,6 +272,13 @@
         if (esDomicilio() && mapa && (latitud.value === '' || longitud.value === '')) {
             evento.preventDefault();
             avisar('Marca en el mapa dónde te entregamos tu pedido.', true);
+            contenedorMapa.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        // Fuera de la zona: se detiene aquí para no hacer esperar al cliente (el servidor también lo revisa)
+        if (esDomicilio() && mapa && fueraDeZona) {
+            evento.preventDefault();
             contenedorMapa.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }

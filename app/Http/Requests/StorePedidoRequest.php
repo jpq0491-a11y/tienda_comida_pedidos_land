@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Sucursal;
+use App\Services\CalculadoraDistancia;
 use App\Services\Carrito;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 /**
  * Valida los datos del cliente al confirmar el pedido en el checkout.
@@ -73,6 +76,36 @@ class StorePedidoRequest extends FormRequest
             'paga_con.min' => 'Debes pagar con al menos el total del pedido ($'.number_format($this->total(), 2).').',
             'paga_con.max' => 'La cantidad no puede ser mayor a $99,999.',
             'notas.max' => 'Las notas no pueden tener más de 500 caracteres.',
+        ];
+    }
+
+    /**
+     * Revisiones que se hacen después de las reglas de arriba.
+     * Aquí: que la ubicación del mapa esté dentro del radio de entrega de la sucursal
+     * (radio_entrega_km, hoy 3 km).
+     * Se calcula en el servidor: el aviso del JS se puede saltar.
+     */
+    public function after(): array
+    {
+        return [
+            function (Validator $validator) {
+                // Solo con domicilio y si las coordenadas pasaron sus reglas (si no, ya hay un error)
+                if ($this->input('tipo_entrega') !== 'domicilio'
+                    || $validator->errors()->hasAny(['latitud', 'longitud'])) {
+                    return;
+                }
+
+                $sucursal = Sucursal::firstOrFail();
+                $kilometros = app(CalculadoraDistancia::class)->kilometros(
+                    $sucursal->latitud, $sucursal->longitud, $this->input('latitud'), $this->input('longitud')
+                );
+
+                if ($kilometros > $sucursal->radio_entrega_km) {
+                    $validator->errors()->add('latitud', 'Tu ubicación está a '.number_format($kilometros, 1)
+                        .' km y solo entregamos hasta '.$sucursal->radio_entrega_km
+                        .' km. Puedes elegir recoger tu pedido en la sucursal.');
+                }
+            },
         ];
     }
 

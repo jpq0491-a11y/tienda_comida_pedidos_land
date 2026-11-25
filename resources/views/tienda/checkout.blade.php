@@ -142,11 +142,16 @@
                                     @if ($sucursal)
                                         <div id="mapa-entrega" class="mapa-entrega rounded-3" role="application" aria-labelledby="etiqueta-mapa"
                                             data-latitud="{{ $sucursal->latitud }}" data-longitud="{{ $sucursal->longitud }}"
-                                            data-sucursal="{{ $sucursal->nombre }}"></div>
+                                            data-sucursal="{{ $sucursal->nombre }}" data-radio-km="{{ $sucursal->radio_entrega_km }}"></div>
                                     @endif
                                     <input type="hidden" id="latitud" name="latitud" value="{{ old('latitud') }}">
                                     <input type="hidden" id="longitud" name="longitud" value="{{ old('longitud') }}">
-                                    <div class="form-text">Haz clic en el mapa donde entregamos (puedes arrastrar el marcador para ajustarlo).</div>
+                                    <div class="form-text">
+                                        Haz clic en el mapa donde entregamos (puedes arrastrar el marcador para ajustarlo).
+                                        @if ($sucursal)
+                                            El círculo es nuestra zona de entrega: hasta {{ $sucursal->radio_entrega_km }} km de la sucursal.
+                                        @endif
+                                    </div>
                                     <p id="aviso-ubicacion" class="small mt-1 mb-0" aria-live="polite"></p>
                                     {{-- Los dos campos son un solo dato para el cliente: se muestra un solo error --}}
                                     @if ($errors->hasAny(['latitud', 'longitud']))
