@@ -3,6 +3,36 @@
         <x-estado-pedido :estado="$pedido->estado" class="fs-6" />
     </x-titulo-pagina>
 
+    <x-errores-formulario />
+
+    {{-- Cambiar el estado: PATCH a admin.pedidos.update, lo valida UpdatePedidoRequest --}}
+    <div class="card mb-4">
+        <div class="card-body">
+            <form action="{{ route('admin.pedidos.update', $pedido) }}" method="POST" class="row g-2 align-items-center">
+                @csrf
+                @method('PATCH')
+                <div class="col-auto">
+                    <label for="estado" class="col-form-label fw-semibold">Estado del pedido</label>
+                </div>
+                <div class="col-auto">
+                    <select id="estado" name="estado" class="form-select @error('estado') is-invalid @enderror">
+                        @foreach ([...App\Models\Pedido::ESTADOS_PENDIENTES, ...App\Models\Pedido::ESTADOS_REALIZADOS] as $estado)
+                            {{-- old() conserva lo elegido si la validación falla --}}
+                            <option value="{{ $estado }}" @selected(old('estado', $pedido->estado) === $estado)>
+                                {{ ucfirst(str_replace('_', ' ', $estado)) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> Guardar estado
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="row g-4">
         {{-- Cliente, entrega y pago --}}
         <div class="col-lg-5">

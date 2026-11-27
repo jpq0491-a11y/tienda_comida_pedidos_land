@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdatePedidoRequest;
 use App\Models\Pedido;
 
 // Pedidos del panel de administración (el cliente crea sus pedidos en CheckoutController)
@@ -35,5 +36,14 @@ class PedidoController extends Controller
         $pedido->load(['sucursal', 'productos']);
 
         return view('admin.pedidos.detalle', compact('pedido'));
+    }
+
+    public function update(UpdatePedidoRequest $request, Pedido $pedido)
+    {
+        // validated() solo trae 'estado': aunque manden otros campos (total, teléfono...) no se guardan
+        $pedido->update($request->validated());
+
+        return redirect()->route('admin.pedidos.show', $pedido)
+            ->with('exito', 'El pedido '.$pedido->folio.' ahora está '.str_replace('_', ' ', $pedido->estado).'.');
     }
 }

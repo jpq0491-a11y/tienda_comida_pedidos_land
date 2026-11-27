@@ -39,8 +39,8 @@ Route::middleware(['auth', 'can:administrar'])->prefix('admin')->name('admin.')-
     // CRUD completo (con show), como pide la rúbrica
     Route::resource('productos', ProductoController::class);
 
-    // Panel de pedidos: el admin no crea ni borra pedidos, solo los consulta (y luego cambia su estado)
-    Route::resource('pedidos', PedidoController::class)->only(['index', 'show']);
+    // Panel de pedidos: el admin no crea ni borra pedidos, solo los consulta y cambia su estado (update)
+    Route::resource('pedidos', PedidoController::class)->only(['index', 'show', 'update']);
 });
 
 require __DIR__.'/settings.php';
