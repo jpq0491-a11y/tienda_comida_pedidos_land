@@ -263,7 +263,8 @@ test('el correo trae los datos del pedido', function () {
         ->assertSeeInHtml('Taco al pastor')
         ->assertSeeInHtml('$60.00')
         ->assertSeeInHtml('Sin cebolla')
-        ->assertSeeInHtml(route('pedido.confirmacion', $pedido));
+        ->assertSeeInHtml(route('admin.pedidos.show', $pedido))
+        ->assertDontSeeInHtml(route('pedido.confirmacion', $pedido));
 });
 
 test('si no hay administradores el pedido se guarda sin mandar correo', function () {

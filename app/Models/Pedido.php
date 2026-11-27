@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pedido extends Model
 {
+    // Estados que la tienda todavía tiene que atender
+    public const ESTADOS_PENDIENTES = ['pendiente', 'preparando', 'en_camino'];
+
+    // Estados finales: el pedido ya se cerró
+    public const ESTADOS_REALIZADOS = ['entregado', 'cancelado'];
+
     protected $fillable = [
         'folio',
         'user_id',
@@ -65,6 +73,20 @@ class Pedido extends Model
             : $this->calle.' '.$this->numero_exterior
                 .($this->numero_interior ? ' int. '.$this->numero_interior : '')
                 .', col. '.$this->colonia);
+    }
+
+    // Scope local: Pedido::pendientes()->get()
+    #[Scope]
+    protected function pendientes(Builder $query): void
+    {
+        $query->whereIn('estado', self::ESTADOS_PENDIENTES);
+    }
+
+    // Scope local: Pedido::realizados()->get()
+    #[Scope]
+    protected function realizados(Builder $query): void
+    {
+        $query->whereIn('estado', self::ESTADOS_REALIZADOS);
     }
 
     // Renglones del pedido (producto, cantidad, precio)

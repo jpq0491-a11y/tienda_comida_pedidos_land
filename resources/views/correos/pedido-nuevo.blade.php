@@ -36,8 +36,8 @@
 </x-mail::panel>
 @endif
 
-{{-- En la Etapa 7 este botón llevará al detalle del pedido en el panel de administración --}}
-<x-mail::button :url="route('pedido.confirmacion', $pedido)" color="success">
+{{-- Lleva al detalle del pedido en el panel (pide iniciar sesión como admin) --}}
+<x-mail::button :url="route('admin.pedidos.show', $pedido)" color="success">
 Ver pedido
 </x-mail::button>
 

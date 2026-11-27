@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -26,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        // Los enlaces de paginación ({{ $x->links() }}) usan las clases de Bootstrap 5, no las de Tailwind
+        Paginator::useBootstrapFive();
 
         // Solo los usuarios con rol admin pueden entrar al panel
         Gate::define('administrar', function (User $user) {
