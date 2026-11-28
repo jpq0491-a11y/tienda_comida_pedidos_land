@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ProductoController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,7 +39,8 @@ Route::middleware(['auth', 'can:administrar'])->prefix('admin')->name('admin.')-
     // CRUD completo (con show), como pide la rúbrica
     Route::resource('productos', ProductoController::class);
 
-    // Aquí irá el panel de pedidos
+    // Panel de pedidos: el admin no crea ni borra pedidos, solo los consulta y cambia su estado (update)
+    Route::resource('pedidos', PedidoController::class)->only(['index', 'show', 'update']);
 });
 
 require __DIR__.'/settings.php';

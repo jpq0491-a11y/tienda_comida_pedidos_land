@@ -45,7 +45,12 @@
                                 <i class="bi bi-egg-fried"></i> Productos
                             </a>
                         </li>
-                        {{-- Aquí se agregará Pedidos --}}
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.pedidos.*') ? 'active' : '' }}"
+                                href="{{ route('admin.pedidos.index') }}">
+                                <i class="bi bi-receipt"></i> Pedidos
+                            </a>
+                        </li>
                     </ul>
                 @endcan
 

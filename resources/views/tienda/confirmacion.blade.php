@@ -12,9 +12,9 @@
                 <div class="col-lg-5">
                     <div class="bg-white rounded-3 p-4 h-100">
                         <h5 class="fw-bolder mb-3">Entrega y pago</h5>
-                        {{-- Estado guardado en la base de datos; en la Etapa 7 el admin lo cambia --}}
+                        {{-- Estado guardado en la base de datos; lo cambia el admin desde el panel --}}
                         <p class="mb-3">
-                            Estado: <span class="badge text-bg-warning">{{ ucfirst(str_replace('_', ' ', $pedido->estado)) }}</span>
+                            Estado: <x-estado-pedido :estado="$pedido->estado" />
                         </p>
                         {{-- El teléfono no se muestra: cualquiera con el enlace podría verlo --}}
                         <p class="mb-3">
