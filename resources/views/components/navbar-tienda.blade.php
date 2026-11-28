@@ -42,6 +42,43 @@
                         <i class="bi bi-speedometer2"></i> Panel
                     </a>
                 @endcan
+
+                {{-- Invitado: puede entrar o crear su cuenta (comprar sin cuenta sigue funcionando) --}}
+                @guest
+                    <a class="btn btn-link btn-sm text-decoration-none" href="{{ route('login') }}">
+                        <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+                    </a>
+                    <a class="btn btn-outline-tienda btn-sm" href="{{ route('register') }}">
+                        Registrarse
+                    </a>
+                @endguest
+
+                {{-- Con sesión: menú con su nombre, su cuenta y el botón para salir --}}
+                @auth
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i> {{ auth()->user()->name }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                    <i class="bi bi-gear"></i> Mi cuenta
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                {{-- El logout de Fortify es POST (con @csrf), no un enlace normal --}}
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @endauth
             </div>
         </div>
     </div>
