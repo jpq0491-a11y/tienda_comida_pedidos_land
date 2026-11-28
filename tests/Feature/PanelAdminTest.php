@@ -87,7 +87,7 @@ test('un invitado o un usuario normal no pueden cambiar datos del menú', functi
     $this->assertNotSoftDeleted($this->producto);
 });
 
-test('al iniciar sesión el admin va al panel y un usuario normal al dashboard', function () {
+test('al iniciar sesión el admin va al panel y un cliente a la tienda', function () {
     $admin = User::factory()->admin()->create();
     $usuario = User::factory()->create();
 
@@ -97,5 +97,5 @@ test('al iniciar sesión el admin va al panel y un usuario normal al dashboard',
     auth()->logout();
 
     $this->post(route('login.store'), ['email' => $usuario->email, 'password' => 'password'])
-        ->assertRedirect(route('dashboard'));
+        ->assertRedirect(route('home'));
 });

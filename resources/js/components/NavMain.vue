@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -8,6 +7,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
+import { toUrl } from '@/lib/utils';
 import type { NavItem } from '@/types';
 
 defineProps<{
@@ -27,10 +27,11 @@ const { isCurrentUrl } = useCurrentUrl();
                     :is-active="isCurrentUrl(item.href)"
                     :tooltip="item.title"
                 >
-                    <Link :href="item.href">
+                    <!-- <a> normal: el único enlace es a la tienda (Blade), que necesita carga completa -->
+                    <a :href="toUrl(item.href)">
                         <component :is="item.icon" />
                         <span>{{ item.title }}</span>
-                    </Link>
+                    </a>
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>

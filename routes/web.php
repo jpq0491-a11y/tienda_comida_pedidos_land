@@ -28,10 +28,6 @@ Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.s
 // {pedido:folio}: Laravel busca el pedido por su folio en lugar del id (404 si no existe)
 Route::get('/pedido/{pedido:folio}', [CheckoutController::class, 'confirmacion'])->name('pedido.confirmacion');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
-});
-
 // Panel de administración: requiere sesión iniciada y pasar el Gate 'administrar'
 Route::middleware(['auth', 'can:administrar'])->prefix('admin')->name('admin.')->group(function () {
     Route::view('/', 'admin.inicio')->name('inicio');

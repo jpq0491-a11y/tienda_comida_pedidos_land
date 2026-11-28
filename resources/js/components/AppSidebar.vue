@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
+import { BookOpen, FolderGit2, Store } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -14,14 +13,15 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { home } from '@/routes';
 import type { NavItem } from '@/types';
 
+// Antes apuntaba a /dashboard; ahora regresa a la tienda (Blade)
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
+        title: 'Tienda',
+        href: home(),
+        icon: Store,
     },
 ];
 
@@ -45,9 +45,10 @@ const footerNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
+                        <!-- <a> normal y no <Link>: la tienda es Blade y necesita cargar la página completa -->
+                        <a :href="home().url">
                             <AppLogo />
-                        </Link>
+                        </a>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>

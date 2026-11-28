@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from '@lucide/vue';
+import { usePage } from '@inertiajs/vue3';
+import { BookOpen, Folder, Menu, Search, Store } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
@@ -35,7 +35,7 @@ import UserMenuContent from '@/components/UserMenuContent.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
 import { toUrl } from '@/lib/utils';
-import { dashboard } from '@/routes';
+import { home } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
 type Props = {
@@ -55,9 +55,9 @@ const activeItemStyles =
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
+        title: 'Tienda',
+        href: home(),
+        icon: Store,
     },
 ];
 
@@ -104,10 +104,10 @@ const rightNavItems: NavItem[] = [
                                 class="flex h-full flex-1 flex-col justify-between space-y-4 py-6"
                             >
                                 <nav class="-mx-3 space-y-1">
-                                    <Link
+                                    <a
                                         v-for="item in mainNavItems"
                                         :key="item.title"
-                                        :href="item.href"
+                                        :href="toUrl(item.href)"
                                         class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
                                         :class="
                                             whenCurrentUrl(
@@ -122,7 +122,7 @@ const rightNavItems: NavItem[] = [
                                             class="h-5 w-5"
                                         />
                                         {{ item.title }}
-                                    </Link>
+                                    </a>
                                 </nav>
                                 <div class="flex flex-col space-y-4">
                                     <a
@@ -146,9 +146,9 @@ const rightNavItems: NavItem[] = [
                     </Sheet>
                 </div>
 
-                <Link :href="dashboard()" class="flex items-center gap-x-2">
+                <a :href="home().url" class="flex items-center gap-x-2">
                     <AppLogo />
-                </Link>
+                </a>
 
                 <!-- Desktop Menu -->
                 <div class="hidden h-full lg:flex lg:flex-1">
@@ -161,7 +161,7 @@ const rightNavItems: NavItem[] = [
                                 :key="index"
                                 class="relative flex h-full items-center"
                             >
-                                <Link
+                                <a
                                     :class="[
                                         navigationMenuTriggerStyle(),
                                         whenCurrentUrl(
@@ -170,7 +170,7 @@ const rightNavItems: NavItem[] = [
                                         ),
                                         'h-9 cursor-pointer px-3',
                                     ]"
-                                    :href="item.href"
+                                    :href="toUrl(item.href)"
                                 >
                                     <component
                                         v-if="item.icon"
@@ -178,7 +178,7 @@ const rightNavItems: NavItem[] = [
                                         class="mr-2 h-4 w-4"
                                     />
                                     {{ item.title }}
-                                </Link>
+                                </a>
                                 <div
                                     v-if="isCurrentUrl(item.href)"
                                     class="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"

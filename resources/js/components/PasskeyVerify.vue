@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { UrlMethodPair } from '@inertiajs/core';
-import { router } from '@inertiajs/vue3';
 import { usePasskeyVerify } from '@laravel/passkeys/vue';
 import { KeyRound } from '@lucide/vue';
 import InputError from '@/components/InputError.vue';
@@ -30,7 +29,8 @@ const { verify, isLoading, error, isSupported } = usePasskeyVerify({
           }
         : {}),
     onSuccess: (response) => {
-        router.visit(response.redirect ?? '/dashboard');
+        // Carga completa (no router.visit): la tienda y el panel son Blade, no páginas de Inertia
+        window.location.assign(response.redirect ?? '/');
     },
 });
 </script>
